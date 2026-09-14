@@ -173,7 +173,7 @@ namespace BspMap {
 			categoryTags.emplace_back("Singleplayer");
 		}
 		categoryTags.emplace_back("Custom Visuals");
-		info.suggestedTags.insert(info.suggestedTags.begin(), categoryTags.begin(), categoryTags.end());
+		info.suggestedTags.insert_range(info.suggestedTags.begin(), categoryTags);
 		return info;
 	}
 

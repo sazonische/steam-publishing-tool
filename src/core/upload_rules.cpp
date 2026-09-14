@@ -46,7 +46,7 @@ namespace UploadRules {
 	std::vector<std::string> SyncWithGameInfo(UploadRulesConfig& config, const AddonVpkRules& gameInfoRules) {
 		std::vector<std::string> added = MergeNewEntries(config.includes, config.seenGameInfoIncludes, gameInfoRules.includes);
 		std::vector<std::string> addedExcludes = MergeNewEntries(config.excludes, config.seenGameInfoExcludes, gameInfoRules.excludes);
-		added.insert(added.end(), addedExcludes.begin(), addedExcludes.end());
+		added.append_range(addedExcludes);
 		return added;
 	}
 
