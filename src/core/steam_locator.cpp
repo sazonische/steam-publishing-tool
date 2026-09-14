@@ -120,10 +120,10 @@ namespace SteamLocator {
 			if (entry.isBlock) {
 				const std::string_view path = entry.GetString("path");
 				if (!path.empty()) {
-					addLibrary(std::filesystem::path(QString::fromUtf8(path.data(), static_cast<qsizetype>(path.size())).toStdWString()));
+					addLibrary(std::filesystem::path(QtText::FromStringView(path).toStdWString()));
 				}
 			} else if (!entry.value.empty() && std::all_of(entry.key.begin(), entry.key.end(), ::isdigit)) {
-				addLibrary(std::filesystem::path(QString::fromUtf8(entry.value.data(), static_cast<qsizetype>(entry.value.size())).toStdWString()));
+				addLibrary(std::filesystem::path(QtText::FromStringView(entry.value).toStdWString()));
 			}
 		}
 		return libraries;
@@ -162,7 +162,7 @@ namespace SteamLocator {
 				continue;
 			}
 
-			const std::filesystem::path installPath = Normalize(library / "steamapps" / "common" / std::filesystem::path(QString::fromUtf8(installDir.data(), static_cast<qsizetype>(installDir.size())).toStdWString()));
+			const std::filesystem::path installPath = Normalize(library / "steamapps" / "common" / std::filesystem::path(QtText::FromStringView(installDir).toStdWString()));
 			if (DirectoryExists(installPath)) {
 				return installPath;
 			}

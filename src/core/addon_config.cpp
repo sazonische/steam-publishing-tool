@@ -8,7 +8,7 @@ namespace AddonConfig {
 
 		// Path comparison the way the Windows file system does it: case-insensitive, one kind of slash.
 		std::string NormalizeRelativePath(std::string_view path) {
-			std::string normalized = QString::fromUtf8(path.data(), static_cast<qsizetype>(path.size())).toLower().replace('\\', '/').toStdString();
+			std::string normalized = QtText::FromStringView(path).toLower().replace('\\', '/').toStdString();
 			while (normalized.starts_with("./")) {
 				normalized.erase(0, 2);
 			}

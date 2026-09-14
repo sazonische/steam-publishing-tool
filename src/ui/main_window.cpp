@@ -25,7 +25,7 @@ namespace {
 CMainWindow::CMainWindow(const GameProfile& gameProfile, QWidget* parent) :
 	QMainWindow(parent),
 	_gameProfile(gameProfile) {
-	setWindowTitle(QStringLiteral("Steam Publishing Tool %1 — %2 — %3").arg(QLatin1String(APP_VERSION), QString::fromUtf8(gameProfile.displayName.data(), static_cast<qsizetype>(gameProfile.displayName.size())), QString::fromStdString(SteamSession().GetPersonaName())));
+	setWindowTitle(QStringLiteral("Steam Publishing Tool %1 — %2 — %3").arg(QLatin1String(APP_VERSION), QtText::FromStringView(gameProfile.displayName), QString::fromStdString(SteamSession().GetPersonaName())));
 	setWindowIcon(QIcon(":/icons/app.svg"));
 	resize(1600, 900);
 
@@ -210,7 +210,7 @@ void CMainWindow::BuildLanguageMenu(QMenu* parentMenu) {
 	group->setExclusive(true);
 	const std::string& current = _workshopService->GetLanguage();
 	for (const SteamNames::WorkshopLanguage& language : SteamNames::WorkshopLanguages()) {
-		QAction* action = languageMenu->addAction(QString::fromUtf8(language.displayName.data(), static_cast<qsizetype>(language.displayName.size())));
+		QAction* action = languageMenu->addAction(QtText::FromStringView(language.displayName));
 		action->setCheckable(true);
 		action->setChecked(language.apiName == current);
 		action->setToolTip(tr("Read and write item titles and descriptions in this language"));
@@ -227,7 +227,7 @@ void CMainWindow::OnLanguageChosen(const std::string& language) {
 	_workshopService->SetLanguage(language);
 	AppConfig().Data().workshopLanguage = language;
 	AppConfig().Save();
-	_statusLabel->setText(tr("Workshop texts in %1, reloading…").arg(QString::fromUtf8(SteamNames::LanguageDisplayName(language).data())));
+	_statusLabel->setText(tr("Workshop texts in %1, reloading…").arg(QtText::FromStringView(SteamNames::LanguageDisplayName(language))));
 	RefreshPublishedItems();
 }
 
@@ -345,7 +345,7 @@ bool CMainWindow::PreparePublishContext(PublishContext& context, bool interactiv
 	}
 	if (_gameProfile.contentKind != WORKSHOP_CONTENT_SOURCE2_ADDON) {
 		if (interactive) {
-			QMessageBox::information(this, tr("Publish"), tr("Content upload for %1 is not supported yet.").arg(QString::fromUtf8(_gameProfile.displayName.data(), static_cast<qsizetype>(_gameProfile.displayName.size()))));
+			QMessageBox::information(this, tr("Publish"), tr("Content upload for %1 is not supported yet.").arg(QtText::FromStringView(_gameProfile.displayName)));
 		}
 		return false;
 	}
@@ -505,7 +505,7 @@ void CMainWindow::OnChangeGameClicked() {
 	}
 
 	// Steamworks cannot re-initialise under another AppID in the same process — restart.
-	const QString gameIdArgument = QString::fromUtf8(selectedGame->id.data(), static_cast<qsizetype>(selectedGame->id.size()));
+	const QString gameIdArgument = QtText::FromStringView(selectedGame->id);
 	if (!QProcess::startDetached(QCoreApplication::applicationFilePath(), {QStringLiteral("--game"), gameIdArgument})) {
 		QMessageBox::warning(this, tr("Change game"), tr("Failed to relaunch the application."));
 		return;
@@ -534,7 +534,7 @@ void CMainWindow::RefreshGamePathStatus() {
 	_itemsModel->SetRequiredTags(RequiredTags::Resolve(_gameProfile));
 	OnSelectionChanged();
 	if (paths.game.valid) {
-		_gamePathLabel->setText(QStringLiteral("%1   ·   %2").arg(QDir::toNativeSeparators(QString::fromStdWString(paths.game.path.wstring())), QString::fromUtf8(PathSourceName(paths.game.source).data())));
+		_gamePathLabel->setText(QStringLiteral("%1   ·   %2").arg(QDir::toNativeSeparators(QString::fromStdWString(paths.game.path.wstring())), QtText::FromStringView(PathSourceName(paths.game.source))));
 		_gamePathLabel->setStyleSheet(QString());
 		_gamePathLabel->setToolTip(QString());
 		return;

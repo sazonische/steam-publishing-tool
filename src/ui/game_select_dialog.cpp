@@ -72,8 +72,8 @@ void CGameSelectDialog::PopulateGames() {
 		const ResolvedGamePaths paths = GamePaths().Resolve(profile);
 		const QString pathLine = paths.game.valid ? QDir::toNativeSeparators(QString::fromStdWString(paths.game.path.wstring())) : tr("not found: %1").arg(QString::fromStdString(paths.game.problem));
 
-		auto* gameItem = new QListWidgetItem(QStringLiteral("%1   (AppID %2)\n%3").arg(QString::fromUtf8(profile.displayName.data(), static_cast<qsizetype>(profile.displayName.size()))).arg(profile.appId).arg(pathLine));
-		gameItem->setData(GAME_ID_ROLE, QString::fromUtf8(profile.id.data(), static_cast<qsizetype>(profile.id.size())));
+		auto* gameItem = new QListWidgetItem(QStringLiteral("%1   (AppID %2)\n%3").arg(QtText::FromStringView(profile.displayName)).arg(profile.appId).arg(pathLine));
+		gameItem->setData(GAME_ID_ROLE, QtText::FromStringView(profile.id));
 		if (!paths.game.valid) {
 			gameItem->setForeground(QColor(0x8f, 0x98, 0xa0));
 		}
@@ -94,7 +94,7 @@ void CGameSelectDialog::OnPathsClicked() {
 }
 
 void CGameSelectDialog::SetCurrentGame(std::string_view gameId) {
-	const QString wantedGameId = QString::fromUtf8(gameId.data(), static_cast<qsizetype>(gameId.size()));
+	const QString wantedGameId = QtText::FromStringView(gameId);
 	for (int row = 0; row < _gamesListWidget->count(); ++row) {
 		if (_gamesListWidget->item(row)->data(GAME_ID_ROLE).toString() == wantedGameId) {
 			_gamesListWidget->setCurrentRow(row);

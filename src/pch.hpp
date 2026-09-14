@@ -28,5 +28,6 @@
 
 #include <utils/logger.h>
 #include <utils/path_text.h>
+#include <utils/qt_text.h>
 #include <utils/singleton.h>
 // IWYU pragma: end_exports

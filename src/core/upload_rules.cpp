@@ -5,7 +5,7 @@ namespace UploadRules {
 	namespace {
 
 		QString NormalizeRule(std::string_view rule) {
-			QString normalized = QString::fromUtf8(rule.data(), static_cast<qsizetype>(rule.size())).trimmed().replace('\\', '/').toLower();
+			QString normalized = QtText::FromStringView(rule).trimmed().replace('\\', '/').toLower();
 			while (normalized.endsWith('/')) {
 				normalized.chop(1);
 			}

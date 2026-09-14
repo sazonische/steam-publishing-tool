@@ -5,10 +5,6 @@
 
 namespace {
 
-	QString FromStringView(std::string_view text) {
-		return QString::fromUtf8(text.data(), static_cast<qsizetype>(text.size()));
-	}
-
 	QString ToQString(const std::filesystem::path& path) {
 		return QDir::toNativeSeparators(QString::fromStdWString(path.wstring()));
 	}
@@ -37,7 +33,7 @@ CPathsDialog::CPathsDialog(QWidget* parent) :
 	foldersLayout->setSpacing(18);
 	AddRow(tr("Steam"), nullptr, AppConfig().Data().steamPath, foldersLayout);
 	for (const GameProfile& profile : GameProfiles::All()) {
-		AddRow(FromStringView(profile.displayName), &profile, AppConfig().GetGameInstallPath(profile.id), foldersLayout);
+		AddRow(QtText::FromStringView(profile.displayName), &profile, AppConfig().GetGameInstallPath(profile.id), foldersLayout);
 	}
 	foldersLayout->addStretch();
 
@@ -178,7 +174,7 @@ void CPathsDialog::RefreshRow(PathRow& row) {
 
 void CPathsDialog::OnBrowseClicked(PathRow& row) {
 	const QString startDirectory = row.pathEdit->text().isEmpty() ? QString() : row.pathEdit->text();
-	const QString title = row.profile ? tr("Select the %1 installation folder").arg(FromStringView(row.profile->displayName)) : tr("Select the Steam folder (contains steam.exe)");
+	const QString title = row.profile ? tr("Select the %1 installation folder").arg(QtText::FromStringView(row.profile->displayName)) : tr("Select the Steam folder (contains steam.exe)");
 	const QString selectedDirectory = QFileDialog::getExistingDirectory(this, title, startDirectory);
 	if (selectedDirectory.isEmpty()) {
 		return;

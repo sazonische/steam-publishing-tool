@@ -97,7 +97,7 @@ void CWorkshopService::OnPublishedItemsQueryCompleted(SteamUGCQueryCompleted_t* 
 	if (ioFailure || result->m_eResult != k_EResultOK) {
 		SteamUGC()->ReleaseQueryUGCRequest(queryHandle);
 		_queryInProgress = false;
-		const QString errorMessage = ioFailure ? tr("IO failure while querying Steam") : tr("Steam returned %1").arg(QString::fromUtf8(SteamNames::Result(result->m_eResult).data()));
+		const QString errorMessage = ioFailure ? tr("IO failure while querying Steam") : tr("Steam returned %1").arg(QtText::FromStringView(SteamNames::Result(result->m_eResult)));
 		LogMessage(LOG_ERROR, "Published items query failed: %s\n", errorMessage.toUtf8().constData());
 		Deliver([this, errorMessage]() { Q_EMIT PublishedItemsFailed(errorMessage); });
 		return;
@@ -234,7 +234,7 @@ void CWorkshopService::OnCreateItemCompleted(CreateItemResult_t* result, bool io
 	_createInProgress = false;
 
 	if (ioFailure || result->m_eResult != k_EResultOK) {
-		const QString errorMessage = ioFailure ? tr("IO failure while creating item") : tr("Steam returned %1").arg(QString::fromUtf8(SteamNames::Result(result->m_eResult).data()));
+		const QString errorMessage = ioFailure ? tr("IO failure while creating item") : tr("Steam returned %1").arg(QtText::FromStringView(SteamNames::Result(result->m_eResult)));
 		LogMessage(LOG_ERROR, "CreateItem failed: %s\n", errorMessage.toUtf8().constData());
 		Deliver([this, errorMessage]() { Q_EMIT ItemCreateFailed(errorMessage); });
 		return;
@@ -270,7 +270,7 @@ void CWorkshopService::OnDeleteItemCompleted(DeleteItemResult_t* result, bool io
 	_deletingPublishedFileId = 0;
 
 	if (ioFailure || result->m_eResult != k_EResultOK) {
-		const QString errorMessage = ioFailure ? tr("IO failure while deleting item") : tr("Steam returned %1").arg(QString::fromUtf8(SteamNames::Result(result->m_eResult).data()));
+		const QString errorMessage = ioFailure ? tr("IO failure while deleting item") : tr("Steam returned %1").arg(QtText::FromStringView(SteamNames::Result(result->m_eResult)));
 		LogMessage(LOG_ERROR, "Delete item %llu failed: %s\n", publishedFileId, errorMessage.toUtf8().constData());
 		Deliver([this, publishedFileId, errorMessage]() { Q_EMIT ItemDeleteFailed(publishedFileId, errorMessage); });
 		return;
@@ -421,7 +421,7 @@ void CWorkshopService::OnSubmitUpdateCompleted(SubmitItemUpdateResult_t* result,
 	_updateTagPointers.clear();
 
 	if (ioFailure || result->m_eResult != k_EResultOK) {
-		const QString errorMessage = ioFailure ? tr("IO failure while submitting update") : tr("Steam returned %1").arg(QString::fromUtf8(SteamNames::Result(result->m_eResult).data()));
+		const QString errorMessage = ioFailure ? tr("IO failure while submitting update") : tr("Steam returned %1").arg(QtText::FromStringView(SteamNames::Result(result->m_eResult)));
 		LogMessage(LOG_ERROR, "Update of %llu failed: %s\n", publishedFileId, errorMessage.toUtf8().constData());
 		Deliver([this, publishedFileId, errorMessage]() { Q_EMIT UpdateFailed(publishedFileId, errorMessage); });
 		return;
@@ -526,7 +526,7 @@ void CWorkshopService::PublishLegacyFile(const std::string& cloudFileName) {
 void CWorkshopService::OnLegacyPublishCompleted(RemoteStoragePublishFileResult_t* result, bool ioFailure) {
 	_legacyPublishInProgress = false;
 	if (ioFailure || result->m_eResult != k_EResultOK) {
-		const QString errorMessage = ioFailure ? tr("IO failure while publishing the file") : tr("Steam returned %1").arg(QString::fromUtf8(SteamNames::Result(result->m_eResult).data()));
+		const QString errorMessage = ioFailure ? tr("IO failure while publishing the file") : tr("Steam returned %1").arg(QtText::FromStringView(SteamNames::Result(result->m_eResult)));
 		LogMessage(LOG_ERROR, "PublishWorkshopFile failed: %s\n", errorMessage.toUtf8().constData());
 		Deliver([this, errorMessage]() { Q_EMIT LegacyFilePublishFailed(errorMessage); });
 		return;
@@ -574,7 +574,7 @@ void CWorkshopService::OnLegacyUpdateCompleted(RemoteStorageUpdatePublishedFileR
 	const PublishedFileId_t publishedFileId = _legacyUpdatingPublishedFileId;
 	_legacyUpdatingPublishedFileId = 0;
 	if (ioFailure || result->m_eResult != k_EResultOK) {
-		const QString errorMessage = ioFailure ? tr("IO failure while updating the file") : tr("Steam returned %1").arg(QString::fromUtf8(SteamNames::Result(result->m_eResult).data()));
+		const QString errorMessage = ioFailure ? tr("IO failure while updating the file") : tr("Steam returned %1").arg(QtText::FromStringView(SteamNames::Result(result->m_eResult)));
 		LogMessage(LOG_ERROR, "CommitPublishedFileUpdate(%llu) failed: %s\n", publishedFileId, errorMessage.toUtf8().constData());
 		Deliver([this, publishedFileId, errorMessage]() { Q_EMIT LegacyFileUpdateFailed(publishedFileId, errorMessage); });
 		return;

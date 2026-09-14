@@ -15,10 +15,6 @@ namespace {
 	constexpr const char* LEGAL_AGREEMENT_URL = "steam://url/CommunityFilePage/%1";
 	constexpr const char* TAG_PROPERTY = "workshopTag";
 
-	QString FromStringView(std::string_view text) {
-		return QString::fromUtf8(text.data(), static_cast<qsizetype>(text.size()));
-	}
-
 	// Steam stores descriptions with CRLF, QPlainTextEdit returns LF — without normalisation an untouched
 	// description looks changed and rides along with every update.
 	std::string NormalizeLineEndings(std::string text) {
@@ -55,7 +51,7 @@ CItemEditDialog::CItemEditDialog(const GameProfile& gameProfile, Mode mode, cons
 	_contentAvailable = gameProfile.contentKind == WORKSHOP_CONTENT_SOURCE1_BSP || !_publishContext.addons.empty();
 
 	switch (_mode) {
-		case MODE_NEW: setWindowTitle(tr("New workshop item — %1").arg(FromStringView(gameProfile.displayName))); break;
+		case MODE_NEW: setWindowTitle(tr("New workshop item — %1").arg(QtText::FromStringView(gameProfile.displayName))); break;
 		case MODE_REUPLOAD: setWindowTitle(tr("Update — %1 (%2)").arg(QString::fromStdString(item.title)).arg(item.publishedFileId)); break;
 		default: setWindowTitle(tr("Edit — %1 (%2)").arg(QString::fromStdString(item.title)).arg(item.publishedFileId)); break;
 	}
@@ -120,7 +116,7 @@ void CItemEditDialog::BuildUi() {
 	tagsLayout->setContentsMargins(0, 12, 0, 0);
 	tagsLayout->addWidget(BuildTagsAndModesSection());
 	tagsLayout->addStretch();
-	tabs->addTab(tagsPage, FromStringView(_gameProfile.tagsSectionTitle));
+	tabs->addTab(tagsPage, QtText::FromStringView(_gameProfile.tagsSectionTitle));
 	auto* mediaPage = new QWidget(tabs);
 	auto* mediaLayout = new QVBoxLayout(mediaPage);
 	mediaLayout->setContentsMargins(0, 12, 0, 0);
@@ -495,7 +491,7 @@ QWidget* CItemEditDialog::BuildMetadataSection() {
 
 	_visibilityComboBox = new QComboBox(groupBox);
 	for (const ERemoteStoragePublishedFileVisibility visibility : {k_ERemoteStoragePublishedFileVisibilityPublic, k_ERemoteStoragePublishedFileVisibilityFriendsOnly, k_ERemoteStoragePublishedFileVisibilityPrivate, k_ERemoteStoragePublishedFileVisibilityUnlisted}) {
-		_visibilityComboBox->addItem(FromStringView(SteamNames::Visibility(visibility)), static_cast<int>(visibility));
+		_visibilityComboBox->addItem(QtText::FromStringView(SteamNames::Visibility(visibility)), static_cast<int>(visibility));
 	}
 	_visibilityComboBox->setCurrentIndex(_visibilityComboBox->findData(static_cast<int>(_isNewSubmission ? k_ERemoteStoragePublishedFileVisibilityPrivate : _item.visibility)));
 
@@ -511,7 +507,7 @@ QWidget* CItemEditDialog::BuildMetadataSection() {
 	layout->setVerticalSpacing(8);
 	layout->setColumnMinimumWidth(0, 83);
 	layout->setColumnStretch(1, 1);
-	const QString languageName = FromStringView(SteamNames::LanguageDisplayName(AppConfig().Data().workshopLanguage));
+	const QString languageName = QtText::FromStringView(SteamNames::LanguageDisplayName(AppConfig().Data().workshopLanguage));
 	layout->addWidget(new QLabel(tr("Title (%1)").arg(languageName), groupBox), 0, 0);
 	layout->addWidget(_titleEdit, 0, 1);
 	layout->addWidget(_titleCounterLabel, 1, 1, Qt::AlignRight);
@@ -528,7 +524,7 @@ QWidget* CItemEditDialog::BuildMetadataSection() {
 }
 
 QWidget* CItemEditDialog::BuildTagsAndModesSection() {
-	auto* groupBox = new QGroupBox(FromStringView(_gameProfile.tagsSectionTitle), this);
+	auto* groupBox = new QGroupBox(QtText::FromStringView(_gameProfile.tagsSectionTitle), this);
 	groupBox->setObjectName("editorTags");
 	auto* layout = new QVBoxLayout(groupBox);
 	layout->setContentsMargins(12, 12, 12, 12);
@@ -562,15 +558,15 @@ QWidget* CItemEditDialog::BuildTagsAndModesSection() {
 	}
 
 	for (const WorkshopTagGroup& tagGroup : _gameProfile.tagGroups) {
-		auto* groupLabel = new QLabel(FromStringView(tagGroup.title), groupBox);
+		auto* groupLabel = new QLabel(QtText::FromStringView(tagGroup.title), groupBox);
 		layout->addWidget(groupLabel);
 
 		auto* gridLayout = new QGridLayout();
 		int tagIndex = 0;
 		for (std::string_view tag : tagGroup.tags) {
 			// In a button text & is a mnemonic, so it is escaped and the tag itself is stored separately.
-			auto* checkBox = new QCheckBox(FromStringView(tag).replace('&', QStringLiteral("&&")), groupBox);
-			checkBox->setProperty(TAG_PROPERTY, FromStringView(tag));
+			auto* checkBox = new QCheckBox(QtText::FromStringView(tag).replace('&', QStringLiteral("&&")), groupBox);
+			checkBox->setProperty(TAG_PROPERTY, QtText::FromStringView(tag));
 			checkBox->setChecked(RequiredTags::ContainsTag(_item.tags, tag));
 			gridLayout->addWidget(checkBox, tagIndex / TAG_CHECKBOX_COLUMNS, tagIndex % TAG_CHECKBOX_COLUMNS);
 			_groupTagCheckBoxes.push_back(checkBox);
@@ -780,7 +776,7 @@ void CItemEditDialog::RefreshAdditionalPreviewsList() {
 	_additionalPreviewsList->clear();
 	_additionalPreviewsHintLabel->setText(_additionalPreviews.empty() ? tr("No additional images or videos yet. Add screenshots or a YouTube video to show more of your map. The main preview is on the Text and preview tab.") : tr("Additional media for the Workshop page. Removals take effect when you submit; select an item to undo its removal."));
 	for (const AdditionalPreviewEntry& entry : _additionalPreviews) {
-		const QString kind = FromStringView(SteamNames::PreviewType(entry.addition.type));
+		const QString kind = QtText::FromStringView(SteamNames::PreviewType(entry.addition.type));
 		const QString source = entry.existing ? QString::fromStdString(entry.addition.pathOrVideoId) : QFileInfo(QString::fromStdString(entry.addition.pathOrVideoId)).fileName();
 		QString text = QStringLiteral("%1: %2").arg(kind, source);
 		if (entry.markedForRemoval) {
@@ -1139,7 +1135,7 @@ void CItemEditDialog::reject() {
 
 void CItemEditDialog::OnUpdateProgressTick() {
 	const WorkshopUpdateProgress progress = _workshopService->GetUpdateProgress();
-	_statusLabel->setText(FromStringView(SteamNames::ItemUpdateStatus(progress.status)));
+	_statusLabel->setText(QtText::FromStringView(SteamNames::ItemUpdateStatus(progress.status)));
 	if (progress.bytesTotal > 0) {
 		_progressBar->setValue(static_cast<int>(progress.bytesProcessed * 100 / progress.bytesTotal));
 	}

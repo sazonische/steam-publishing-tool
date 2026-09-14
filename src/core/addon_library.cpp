@@ -31,7 +31,7 @@ namespace AddonLibrary {
 		};
 
 		bool EqualsIgnoreCase(const std::string& left, std::string_view right) {
-			return QString::fromStdString(left).compare(QString::fromUtf8(right.data(), static_cast<qsizetype>(right.size())), Qt::CaseInsensitive) == 0;
+			return QString::fromStdString(left).compare(QtText::FromStringView(right), Qt::CaseInsensitive) == 0;
 		}
 
 		// vpks/<id>/publish_data.txt: "source_folder" -> addon folder. One addon may have been published
@@ -59,7 +59,7 @@ namespace AddonLibrary {
 					continue;
 				}
 
-				const std::string sourceFolder = QString::fromUtf8(publishData->GetString("source_folder").data()).toLower().toStdString();
+				const std::string sourceFolder = QtText::FromStringView(publishData->GetString("source_folder")).toLower().toStdString();
 				if (sourceFolder.empty()) {
 					continue;
 				}

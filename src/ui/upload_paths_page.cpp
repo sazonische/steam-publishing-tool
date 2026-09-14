@@ -5,10 +5,6 @@
 
 namespace {
 
-	QString FromStringView(std::string_view text) {
-		return QString::fromUtf8(text.data(), static_cast<qsizetype>(text.size()));
-	}
-
 	QListWidget* BuildRulesList(QWidget* parent) {
 		auto* list = new QListWidget(parent);
 		list->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -36,7 +32,7 @@ CUploadPathsPage::CUploadPathsPage(QWidget* parent) :
 
 	_gameComboBox = new QComboBox(this);
 	for (const GameProfile& profile : GameProfiles::All()) {
-		_gameComboBox->addItem(FromStringView(profile.displayName));
+		_gameComboBox->addItem(QtText::FromStringView(profile.displayName));
 	}
 
 	_sourceLabel = new QLabel(this);

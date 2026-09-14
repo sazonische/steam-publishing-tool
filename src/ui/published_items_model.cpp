@@ -207,7 +207,7 @@ QVariant CPublishedItemsModel::GetDisplayValue(const WorkshopItem& item, Column 
 		case COLUMN_DESCRIPTION:
 			return ShortenDescription(item.description);
 		case COLUMN_VISIBILITY:
-			return QString::fromUtf8(SteamNames::Visibility(item.visibility).data());
+			return QtText::FromStringView(SteamNames::Visibility(item.visibility));
 		case COLUMN_UPDATED:
 			return FormatTimestamp(item.timeUpdated);
 		case COLUMN_CREATED:
