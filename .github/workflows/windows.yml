@@ -1,14 +1,12 @@
 name: Windows
 
-# One artifact — a self-contained static exe. Qt is built by vcpkg from source: a cold run
-# takes an hour or more, a warm one restores the archives in minutes, so the archive cache
-# is saved right after vcpkg install, even if the next step fails.
+# One artifact — a self-contained static exe, built only when a version tag is pushed (or by hand
+# from the Actions tab). Qt is built by vcpkg from source: a cold run takes an hour or more, a warm
+# one restores the archives in minutes, so the archive cache is saved right after vcpkg install,
+# even if the next step fails.
 on:
   push:
-    branches: [main]
-    # Tags are usually created by the release job itself; the patterns keep a manual tag working too.
     tags: ['v*', '[0-9]+.[0-9]+.[0-9]+']
-  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -17,7 +15,7 @@ permissions:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   # A tag build is never cancelled midway: its artifact becomes the release.
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: false
 
 defaults:
   run:
@@ -196,10 +194,8 @@ jobs:
 
   release:
     name: Publish release
-    # Two paths, and neither needs a file uploaded by hand:
-    #   * tag — push a tag or draft a release in the UI; the tag is the version, the exe is attached;
-    #   * bump — raise project(VERSION) and push to main; the tag and the release are created here.
-    # An already tagged version is a green no-op; ordinary pushes publish nothing.
+    # Push a tag such as 1.0.1 (or draft a release in the UI) and the exe is attached to it; nothing
+    # is uploaded by hand. A manual run from the Actions tab only builds the artifact.
     if: github.event_name == 'push'
     needs: [meta, build]
     runs-on: ubuntu-latest
