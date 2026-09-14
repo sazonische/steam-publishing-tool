@@ -1,0 +1,38 @@
+{
+	"$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+	"name": "steam-publishing-tool",
+	"version-string": "1.0.0",
+	"builtin-baseline": "a1cae005c39be7b18ba319fced856b68d7276271",
+	"dependencies": [
+		"blake3",
+		"glaze"
+	],
+	"features": {
+		"static-qt": {
+			"description": "Static Qt for the single-executable release build",
+			"dependencies": [
+				{
+					"name": "qtbase",
+					"default-features": false,
+					"features": [
+						"gui",
+						"widgets",
+						"network",
+						"thread",
+						"concurrent",
+						"png",
+						"jpeg",
+						"freetype",
+						"harfbuzz",
+						"doubleconversion",
+						"pcre2"
+					]
+				},
+				{
+					"name": "qtsvg",
+					"default-features": false
+				}
+			]
+		}
+	}
+}

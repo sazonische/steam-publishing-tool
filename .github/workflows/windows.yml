@@ -1,0 +1,243 @@
+name: Windows
+
+# One artifact — a self-contained static exe. Qt is built by vcpkg from source: a cold run
+# takes an hour or more, a warm one restores the archives in minutes, so the archive cache
+# is saved right after vcpkg install, even if the next step fails.
+on:
+  push:
+    branches: [main]
+    # Tags are usually created by the release job itself; the patterns keep a manual tag working too.
+    tags: ['v*', '[0-9]+.[0-9]+.[0-9]+']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # A tag build is never cancelled midway: its artifact becomes the release.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  format:
+    name: clang-format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # The same major version as locally (LLVM 21): different versions format differently.
+      - name: Check formatting
+        shell: bash
+        run: |
+          pip install --quiet 'clang-format==21.*'
+          find src -name '*.cpp' -o -name '*.h' -o -name '*.hpp' | xargs clang-format --dry-run -Werror
+
+  meta:
+    name: Project version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      # On a tag the version is the tag itself: it names the release, the build reports it (-DSPT_VERSION),
+      # the artifact is named after it. Off a tag the version is project(VERSION) from CMakeLists, as locally.
+      - id: version
+        shell: bash
+        run: |
+          declared=$(sed -nE 's/^project\(steam-publishing-tool VERSION ([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' CMakeLists.txt)
+          if [ -z "$declared" ]; then echo "project(VERSION ...) not found in CMakeLists.txt" >&2; exit 1; fi
+          version="$declared"
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            version="${GITHUB_REF_NAME#v}"
+            if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "tag $GITHUB_REF_NAME is not a MAJOR.MINOR.PATCH version" >&2; exit 1
+            fi
+            if [ "$version" != "$declared" ]; then
+              echo "::notice::building tag $GITHUB_REF_NAME as version $version; project(VERSION) still says $declared — the tag wins"
+            fi
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "version $version (declared $declared, $GITHUB_REF_TYPE $GITHUB_REF_NAME)"
+
+  build:
+    name: Static exe
+    needs: [meta, format]
+    runs-on: windows-2025
+    timeout-minutes: 240
+    permissions:
+      contents: read
+      id-token: write     # both are needed for the attestation below
+      attestations: write
+    env:
+      VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-archives
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      # Our own vcpkg at exactly the builtin-baseline from vcpkg.json. The one preinstalled on the runner
+      # (and the one Visual Studio installs) lags behind the baseline scripts and breaks port builds.
+      - name: Checkout vcpkg at the manifest baseline
+        id: vcpkg
+        run: |
+          # ilammy/msvc-dev-cmd has already pointed $env:VCPKG_ROOT at the Visual Studio vcpkg, so the
+          # path is spelled out here and exported for every later step.
+          $vcpkgRoot = "${{ github.workspace }}/vcpkg"
+          $baseline = (Get-Content vcpkg.json -Raw | ConvertFrom-Json).'builtin-baseline'
+          git clone --filter=blob:none https://github.com/microsoft/vcpkg.git $vcpkgRoot
+          git -C $vcpkgRoot checkout --quiet $baseline
+          & "$vcpkgRoot/bootstrap-vcpkg.bat" -disableMetrics
+          if ($LASTEXITCODE -ne 0) { throw "bootstrap-vcpkg failed ($LASTEXITCODE)" }
+          "baseline=$baseline" >> $env:GITHUB_OUTPUT
+          "VCPKG_ROOT=$vcpkgRoot" >> $env:GITHUB_ENV
+
+      # The cache holds built package archives. The key changes with the manifest and the triplet: a
+      # different feature set means a different ABI, and restore-keys reuse an old cache for unchanged ports.
+      - name: Restore vcpkg packages
+        id: vcpkg-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ github.workspace }}/vcpkg-archives
+          key: vcpkg-static-${{ steps.vcpkg.outputs.baseline }}-${{ hashFiles('vcpkg.json', 'triplets/*.cmake') }}
+          restore-keys: |
+            vcpkg-static-${{ steps.vcpkg.outputs.baseline }}-
+            vcpkg-static-
+
+      # The same set as in the static-release preset. --clean-after-build: the qtbase buildtrees are
+      # tens of gigabytes and the runner disk is finite.
+      - name: Build dependencies (static Qt)
+        run: |
+          New-Item -ItemType Directory -Force $env:VCPKG_DEFAULT_BINARY_CACHE | Out-Null
+          "free on C: {0:N1} GB (before)" -f ((Get-PSDrive C).Free / 1GB)
+          & "$env:VCPKG_ROOT/vcpkg.exe" install `
+            --triplet x64-windows-static-release `
+            --host-triplet x64-windows-static-release `
+            --overlay-triplets=triplets `
+            --x-manifest-root=. `
+            --x-install-root=build/vcpkg_installed `
+            --x-feature=static-qt `
+            --clean-after-build
+          if ($LASTEXITCODE -ne 0) { throw "vcpkg install failed ($LASTEXITCODE)" }
+          "free on C: {0:N1} GB (after)" -f ((Get-PSDrive C).Free / 1GB)
+
+      # Saved right after the expensive step, regardless of how the rest goes.
+      - name: Save vcpkg packages
+        if: always() && steps.vcpkg-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ github.workspace }}/vcpkg-archives
+          key: ${{ steps.vcpkg-cache.outputs.cache-primary-key }}
+
+      - name: Configure
+        run: cmake --preset static-release "-DSPT_VERSION=${{ needs.meta.outputs.version }}" "-DSPT_GITHUB_REPOSITORY=${{ github.repository }}"
+
+      - name: Build
+        run: cmake --build --preset static-release
+
+      # "Static" is a claim worth checking: the exe must not pull in Qt or the MSVC runtime.
+      # The only allowed non-system dependency is steam_api64.dll, and only as a delay-load
+      # import: it is embedded into the exe as a resource and loaded from AppLocalData.
+      - name: Package
+        id: package
+        run: |
+          $exe = "SteamPublishingTool-${{ needs.meta.outputs.version }}-windows-x64.exe"
+          Copy-Item build/static-release/SteamPublishingTool.exe $exe
+          $dumpbin = Get-Command dumpbin.exe -ErrorAction Stop
+          $output = & $dumpbin.Source /dependents $exe
+          $delayStart = ($output | Select-String 'delay load dependencies').LineNumber
+          $regular = if ($delayStart) { $output[0..($delayStart - 2)] } else { $output }
+          if ($regular -match 'Qt6|VCRUNTIME|MSVCP|api-ms-win-crt|steam_api') {
+            throw "the static exe still has a regular import of Qt, the MSVC runtime or steam_api:`n$($output -join "`n")"
+          }
+          if (-not ($output -match 'steam_api64\.dll')) {
+            throw "steam_api64.dll is not delay-loaded any more — check /DELAYLOAD in CMakeLists.txt"
+          }
+          "exe size: {0:N1} MB" -f ((Get-Item $exe).Length / 1MB)
+          "exe=$exe" >> $env:GITHUB_OUTPUT
+
+      # A free substitute for code signing: anyone can verify that the exe was built by this workflow
+      # from this commit — `gh attestation verify <exe> --repo <owner>/<repo>`.
+      - name: Attest build provenance
+        if: github.event_name == 'push'
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: ${{ steps.package.outputs.exe }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SteamPublishingTool-${{ needs.meta.outputs.version }}-windows-x64
+          path: ${{ steps.package.outputs.exe }}
+          if-no-files-found: error
+
+      # vcpkg prints only BUILD_FAILED and points at logs in buildtrees, which die with the runner.
+      # A failed run costs an hour, so the logs are taken along.
+      - name: Collect vcpkg logs
+        if: failure()
+        run: |
+          New-Item -ItemType Directory -Force vcpkg-logs | Out-Null
+          Get-ChildItem "$env:VCPKG_ROOT/buildtrees" -Recurse -Filter *.log -ErrorAction SilentlyContinue |
+            Select-Object -First 200 |
+            ForEach-Object { Copy-Item $_.FullName (Join-Path "vcpkg-logs" ($_.Directory.Name + "_" + $_.Name)) -ErrorAction SilentlyContinue }
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: vcpkg-logs
+          path: vcpkg-logs
+          if-no-files-found: ignore
+          retention-days: 7
+
+  release:
+    name: Publish release
+    # Two paths, and neither needs a file uploaded by hand:
+    #   * tag — push a tag or draft a release in the UI; the tag is the version, the exe is attached;
+    #   * bump — raise project(VERSION) and push to main; the tag and the release are created here.
+    # An already tagged version is a green no-op; ordinary pushes publish nothing.
+    if: github.event_name == 'push'
+    needs: [meta, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Create release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.meta.outputs.version }}
+        run: |
+          tag="$VERSION"
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            tag="$GITHUB_REF_NAME"
+          else
+            existing=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq .object.sha 2>/dev/null || true)
+            if [ -n "$existing" ] && [ "$existing" != "$GITHUB_SHA" ]; then
+              echo "version $VERSION is already tagged at ${existing:0:7} — nothing to release."
+              exit 0
+            fi
+          fi
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            # The release exists — attach only the missing files, existing ones are left alone.
+            attached=" $(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' | tr '\n' ' ') "
+            for file in artifacts/*/*; do
+              name=$(basename "$file")
+              case "$attached" in
+                *" $name "*) echo "release $tag already carries $name" ;;
+                *) echo "attaching $name to existing release $tag"
+                   gh release upload "$tag" --repo "$GITHUB_REPOSITORY" "$file" ;;
+              esac
+            done
+            exit 0
+          fi
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "Steam Publishing Tool $tag" --generate-notes \
+            artifacts/*/*

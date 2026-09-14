@@ -1,0 +1,69 @@
+{
+	"version": 3,
+	"cmakeMinimumRequired": {
+		"major": 3,
+		"minor": 25,
+		"patch": 0
+	},
+	"configurePresets": [
+		{
+			"name": "default",
+			"displayName": "Default Config",
+			"description": "Ninja + MSVC + vcpkg manifest",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/build/${presetName}",
+			"hidden": true,
+			"toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+			"cacheVariables": {
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+				"CMAKE_CXX_COMPILER": "cl.exe",
+				"VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/triplets"
+			}
+		},
+		{
+			"name": "msvc-debug",
+			"displayName": "Debug (dynamic Qt from QT_ROOT)",
+			"inherits": "default",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"VCPKG_TARGET_TRIPLET": "x64-windows",
+				"CMAKE_PREFIX_PATH": "$env{QT_ROOT}"
+			}
+		},
+		{
+			"name": "msvc-release",
+			"displayName": "RelWithDebInfo (dynamic Qt from QT_ROOT)",
+			"inherits": "default",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "RelWithDebInfo",
+				"VCPKG_TARGET_TRIPLET": "x64-windows",
+				"CMAKE_PREFIX_PATH": "$env{QT_ROOT}"
+			}
+		},
+		{
+			"name": "static-release",
+			"displayName": "Release (fully static, Qt from vcpkg)",
+			"inherits": "default",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"VCPKG_TARGET_TRIPLET": "x64-windows-static-release",
+				"VCPKG_HOST_TRIPLET": "x64-windows-static-release",
+				"VCPKG_MANIFEST_FEATURES": "static-qt"
+			}
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "msvc-debug",
+			"configurePreset": "msvc-debug"
+		},
+		{
+			"name": "msvc-release",
+			"configurePreset": "msvc-release"
+		},
+		{
+			"name": "static-release",
+			"configurePreset": "static-release"
+		}
+	]
+}

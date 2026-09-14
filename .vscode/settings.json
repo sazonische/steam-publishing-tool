@@ -1,0 +1,27 @@
+{
+	"C_Cpp.intelliSenseEngine": "disabled", // clangd is used
+	"clangd.arguments": [
+		"--fallback-style=Mozilla",
+		"--function-arg-placeholders=false",
+		"--completion-style=detailed",
+		"--header-insertion=iwyu",
+		"--header-insertion-decorators",
+		"--background-index"
+	],
+	"[cpp]": {
+		"editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
+		"editor.formatOnSave": true
+	},
+	"cmake.configureOnOpen": true,
+	"cmake.useCMakePresets": "always",
+	"files.associations": {
+		"*.qss": "css",
+		"algorithm": "cpp",
+		"vector": "cpp",
+		"chrono": "cpp",
+		"expected": "cpp",
+		"optional": "cpp",
+		"system_error": "cpp",
+		"xstring": "cpp"
+	}
+}

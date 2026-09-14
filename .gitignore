@@ -1,0 +1,22 @@
+/build/
+/build*
+/install/
+/dist/
+
+.vs
+.cache
+.idea
+cmake-*
+CMakeUserPresets.json
+vcpkg_installed/
+.claude
+
+steam_appid.txt
+*.user
+/tools/steamworks_sdk_*.zip
+
+# Local noise
+*.log
+*.tmp
+Thumbs.db
+/out/

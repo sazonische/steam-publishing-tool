@@ -1,0 +1,454 @@
+/* Source 2 tools theme (Hammer, Workshop Manager): palette from
+   game/core/tools/stylesheets/qtabbedstyle_colors.vsc. The colours are deliberately Valve's own. */
+
+QWidget {
+	font-family: "Segoe UI", sans-serif;
+	font-size: 9pt;
+	color: #b6b6b7;
+}
+
+QMainWindow, QDialog {
+	background-color: #363636;
+}
+
+/* --- Menus --- */
+
+QMenuBar {
+	background-color: #2e2e2e;
+	color: #b6b6b7;
+	border-bottom: 1px solid #252525;
+}
+
+QMenuBar::item {
+	padding: 4px 8px;
+	background: transparent;
+}
+
+QMenuBar::item:selected {
+	background-color: #4f5259;
+	color: #ffffff;
+}
+
+QMenu {
+	background-color: #2e2e2e;
+	color: #b6b6b7;
+	border: 1px solid #181819;
+}
+
+QMenu::item {
+	padding: 5px 28px 5px 24px;
+}
+
+QMenu::item:selected {
+	background-color: #4f5259;
+	color: #ffffff;
+}
+
+QMenu::item:disabled {
+	color: #6a6a6c;
+}
+
+QMenu::separator {
+	height: 1px;
+	background: #252525;
+	margin: 4px 6px;
+}
+
+QMenu::icon {
+	margin-left: 4px;
+}
+
+/* --- Toolbar: big buttons, icon above the caption, like Workshop Manager --- */
+
+QToolBar {
+	background-color: #262626;
+	border-top: 1px solid #363636;
+	border-bottom: 1px solid #262626;
+	padding: 3px;
+	spacing: 2px;
+}
+
+QToolBar::separator {
+	width: 1px;
+	background: #414141;
+	margin: 4px 4px;
+}
+
+QToolBar QToolButton {
+	background-color: #323232;
+	color: #b6b6b7;
+	border: 1px solid #606060;
+	border-radius: 2px;
+	padding: 3px 4px 2px 4px;
+	min-width: 40px;
+}
+
+QToolBar QToolButton:hover {
+	background-color: #3e3e3e;
+	border-color: #7a7a7a;
+	color: #ffffff;
+}
+
+QToolBar QToolButton:pressed, QToolBar QToolButton:checked {
+	background-color: #555555;
+	border-color: #bf773b;
+}
+
+QToolBar QToolButton:disabled {
+	background-color: #282828;
+	color: #6a6a6c;
+	border-color: #505050;
+}
+
+/* --- Status bar --- */
+
+QStatusBar {
+	background-color: #2e2e2e;
+	color: #b6b6b7;
+	border-top: 1px solid #252525;
+}
+
+QStatusBar::item {
+	border: none;
+}
+
+/* --- Tables and lists --- */
+
+QTableView, QListWidget, QListView, QTreeView {
+	background-color: #262627;
+	alternate-background-color: #373737;
+	gridline-color: #414141;
+	color: #b6b6b7;
+	selection-background-color: #4f5259;
+	selection-color: #ffffff;
+	border: 1px solid #1a1a1a;
+	outline: none;
+}
+
+QTableView::item {
+	padding: 4px;
+	border-bottom: 1px solid #414141;
+}
+
+QTableView::item:selected, QListWidget::item:selected, QListView::item:selected {
+	background-color: #4f5259;
+	color: #ffffff;
+}
+
+QListWidget::item {
+	padding: 6px 8px;
+	border-bottom: 1px solid #414141;
+}
+
+QListWidget::item:hover:!selected {
+	background-color: #3a3a3a;
+}
+
+QHeaderView::section {
+	background-color: #232323;
+	color: #b6b6b7;
+	padding: 5px 8px;
+	border: none;
+	border-right: 1px solid #000000;
+	border-bottom: 1px solid #000000;
+	font-weight: bold;
+}
+
+QHeaderView::section:hover {
+	background-color: #2e2e2e;
+	color: #ffffff;
+}
+
+/* --- Scroll bars --- */
+
+QScrollBar:vertical {
+	background: #2e2e2e;
+	width: 12px;
+	margin: 0;
+}
+
+QScrollBar::handle:vertical {
+	background: #5b5b5b;
+	min-height: 24px;
+	border-radius: 2px;
+	margin: 2px;
+}
+
+QScrollBar::handle:vertical:hover {
+	background: #6e6e6e;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+	height: 0;
+}
+
+QScrollBar:horizontal {
+	background: #2e2e2e;
+	height: 12px;
+	margin: 0;
+}
+
+QScrollBar::handle:horizontal {
+	background: #5b5b5b;
+	min-width: 24px;
+	border-radius: 2px;
+	margin: 2px;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+	width: 0;
+}
+
+/* --- Buttons --- */
+
+QPushButton {
+	background-color: #404040;
+	color: #b6b6b7;
+	border: 1px solid #606060;
+	border-radius: 2px;
+	padding: 5px 14px;
+	min-width: 72px;
+}
+
+QPushButton:hover {
+	background-color: #555e71;
+	color: #ffffff;
+}
+
+QPushButton:pressed {
+	background-color: #485061;
+}
+
+QPushButton:disabled {
+	background-color: #323232;
+	color: #6a6a6c;
+	border-color: #505050;
+}
+
+/* Default button (DefaultButton* from Valve's palette). */
+QPushButton#primaryButton {
+	background-color: #3d4749;
+	color: #ffffff;
+	border: 1px solid #636677;
+	font-weight: bold;
+}
+
+QPushButton#primaryButton:hover {
+	background-color: #4a5658;
+	border-color: #8b9b99;
+}
+
+QPushButton#primaryButton:pressed {
+	background-color: #33393b;
+}
+
+QPushButton#primaryButton:disabled {
+	background-color: #323232;
+	color: #6a6a6c;
+	border-color: #505050;
+}
+
+QPushButton#dangerButton {
+	background-color: #5a2f2f;
+	color: #ffffff;
+	border-color: #ff5a5a;
+}
+
+QPushButton#dangerButton:hover {
+	background-color: #7a3a3a;
+}
+
+QPushButton#dangerButton:disabled {
+	background-color: #323232;
+	color: #6a6a6c;
+	border-color: #505050;
+}
+
+/* --- Input fields --- */
+
+QLineEdit, QTextEdit, QPlainTextEdit, QSpinBox, QComboBox {
+	background-color: #262627;
+	color: #b6b6b7;
+	border: 1px solid #1a1a1a;
+	border-radius: 2px;
+	padding: 3px 5px;
+	selection-background-color: #4f5259;
+	selection-color: #ffffff;
+}
+
+QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus, QSpinBox:focus, QComboBox:focus {
+	border-color: #607fc1;
+}
+
+QLineEdit:disabled, QTextEdit:disabled, QPlainTextEdit:disabled, QComboBox:disabled {
+	color: #6a6a6c;
+	background-color: #2e2e2e;
+}
+
+QComboBox::drop-down {
+	border: none;
+	width: 18px;
+}
+
+QComboBox QAbstractItemView {
+	background-color: #2e2e2e;
+	color: #b6b6b7;
+	selection-background-color: #4f5259;
+	border: 1px solid #181819;
+}
+
+/* --- Miscellaneous --- */
+
+QLabel#titleLabel {
+	font-size: 14pt;
+	font-weight: bold;
+	color: #c8c8c8;
+}
+
+QLabel#hintLabel {
+	color: #989899;
+}
+
+QCheckBox, QRadioButton {
+	color: #b6b6b7;
+	spacing: 6px;
+}
+
+QCheckBox:disabled, QRadioButton:disabled {
+	color: #6a6a6c;
+}
+
+QGroupBox {
+	color: #989899;
+	border: 1px solid #252525;
+	border-radius: 2px;
+	margin-top: 9px;
+	padding-top: 4px;
+}
+
+QGroupBox::title {
+	subcontrol-origin: margin;
+	left: 8px;
+	padding: 0 4px;
+}
+
+QTabWidget::pane {
+	border: 1px solid #252525;
+	background-color: #363636;
+}
+
+QTabBar::tab {
+	background-color: #2a2a2a;
+	color: #989899;
+	border: 1px solid #252525;
+	border-bottom: none;
+	padding: 5px 14px;
+	margin-right: 1px;
+}
+
+QTabBar::tab:selected {
+	background-color: #363636;
+	color: #c8c8c8;
+}
+
+QTabBar::tab:hover:!selected {
+	background-color: #323232;
+	color: #b6b6b7;
+}
+
+QProgressBar {
+	background-color: #262627;
+	border: 1px solid #1a1a1a;
+	border-radius: 2px;
+	text-align: center;
+	color: #c8c8c8;
+}
+
+QProgressBar::chunk {
+	background-color: #607fc1;
+}
+
+QToolTip {
+	background-color: #c6c6c6;
+	color: #000000;
+	border: 1px solid #000000;
+	padding: 3px;
+}
+
+QSplitter::handle {
+	background-color: #4b4b4b;
+}
+/* The title straddles the border, like the native Workshop Manager group boxes. */
+QDialog#itemEditor QGroupBox {
+	border: 1px solid #505050;
+	border-radius: 0;
+	margin-top: 7px;
+	padding-top: 0;
+	color: #b6b6b7;
+}
+
+QDialog#itemEditor QGroupBox::title {
+	subcontrol-origin: margin;
+	subcontrol-position: top left;
+	left: 12px;
+	padding: 0 4px;
+	background-color: #363636;
+}
+
+QTabWidget#editorTabs::pane {
+	border: none;
+	background-color: #363636;
+}
+
+QTabBar#editorTabBar::tab {
+	background-color: #404040;
+	border: 1px solid #606060;
+	border-radius: 2px;
+	min-width: 128px;
+	padding: 7px 12px;
+	margin-right: 8px;
+	color: #b6b6b7;
+}
+
+QTabBar#editorTabBar::tab:selected {
+	background-color: #4f5259;
+	border-color: #8b9b99;
+	color: #ffffff;
+}
+
+QTabBar#editorTabBar::tab:hover:!selected {
+	background-color: #555e71;
+	color: #ffffff;
+}
+
+QTabBar#editorTabBar::tab:focus {
+	color: #ffffff;
+}
+
+QDialog#itemEditor QGroupBox#uploadContent {
+	border: none;
+	margin-top: 0;
+	padding-top: 0;
+}
+
+QDialog#itemEditor QProgressBar {
+	border-radius: 0;
+	min-height: 20px;
+}
+
+QDialog#itemEditor QProgressBar::chunk {
+	background-color: #607fc1;
+}
+
+QDialog#itemEditor QLineEdit, QDialog#itemEditor QComboBox, QDialog#pathsEditor QLineEdit, QDialog#pathsEditor QComboBox {
+	min-height: 20px;
+}
+
+QDialog#itemEditor QPushButton, QDialog#pathsEditor QPushButton {
+	min-height: 16px;
+}
+
+QLabel#sectionLabel {
+	color: #c8c8c8;
+	font-weight: bold;
+}
