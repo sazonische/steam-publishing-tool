@@ -3,10 +3,6 @@
 #include "core/publish_data.h"
 #include "vpk/vpk_writer.h"
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QDateTime>
-#include <QtCore/QLocale>
-
 CPublishPipeline::CPublishPipeline(CWorkshopService* workshopService, QObject* parent) :
 	QObject(parent),
 	_workshopService(workshopService) {
@@ -87,7 +83,7 @@ void CPublishPipeline::Cancel() {
 }
 
 void CPublishPipeline::StartBspUpload() {
-	_job.cloudFileName = "mymaps/" + _job.bspPath.filename().string();
+	_job.cloudFileName = "mymaps/" + PathText::ToUtf8(_job.bspPath.filename());
 	Q_EMIT StageChanged(tr("Uploading %1 to Steam Cloud…").arg(QString::fromStdWString(_job.bspPath.filename().wstring())));
 
 	// Cloud writes go chunk by chunk into the local Steam cache; pump events between chunks so the
@@ -167,7 +163,7 @@ void CPublishPipeline::OnLegacyFileUpdated(PublishedFileId_t publishedFileId, bo
 		return;
 	}
 	_workshopService->DeleteCloudFile(_job.cloudFileName);
-	LogMessage(LOG_INFO, "Replaced map of %llu with %s\n", publishedFileId, _job.bspPath.string().c_str());
+	LogMessage(LOG_INFO, "Replaced map of %llu with %s\n", publishedFileId, PathText::ToUtf8(_job.bspPath).c_str());
 	_legalAgreementNeeded = _legalAgreementNeeded || userNeedsToAcceptLegalAgreement;
 	if (_cancelRequested) {
 		// Steam has already swapped the file; only the page changes are dropped.
@@ -277,7 +273,7 @@ void CPublishPipeline::OnPacked(bool success, const QString& errorMessage) {
 		return;
 	}
 
-	_job.request.contentFolder = OutputDirectory().string();
+	_job.request.contentFolder = PathText::ToUtf8(OutputDirectory());
 	Q_EMIT StageChanged(tr("Uploading to Steam…"));
 
 	QString submitError;
@@ -297,7 +293,7 @@ void CPublishPipeline::OnUpdateSubmitted(PublishedFileId_t publishedFileId, bool
 		return;
 	}
 	_running = false;
-	const std::string source = IsBspJob() ? _job.bspPath.filename().string() : _job.addon.name;
+	const std::string source = IsBspJob() ? PathText::ToUtf8(_job.bspPath.filename()) : _job.addon.name;
 	LogMessage(LOG_INFO, "Published %llu from '%s'\n", publishedFileId, source.c_str());
 	Q_EMIT Finished(publishedFileId, _legalAgreementNeeded || userNeedsToAcceptLegalAgreement);
 }

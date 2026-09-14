@@ -1,10 +1,5 @@
 #pragma once
 
-#include <QtCore/QSize>
-#include <QtCore/QString>
-
-#include <optional>
-
 // Prepares previews for the Steam Workshop limits: < 1 MB per file, any of JPG/PNG/GIF.
 // GIFs are never re-encoded — that would drop the animation they are uploaded for.
 namespace PreviewImage {

@@ -1,12 +1,5 @@
 #include "core/update_checker.h"
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
-#include <QtCore/QUrl>
-#include <QtNetwork/QNetworkReply>
-#include <QtNetwork/QNetworkRequest>
-
 namespace {
 
 	constexpr int REQUEST_TIMEOUT_MS = 10000;

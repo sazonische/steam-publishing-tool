@@ -1,9 +1,6 @@
 #pragma once
 
-#include <array>
 #include <cstddef>
-#include <cstdint>
-#include <span>
 
 // CRC-32 (IEEE 802.3, polynomial 0xEDB88320) — the same as zlib and the one Valve writes into VPK entries.
 namespace Crc32 {

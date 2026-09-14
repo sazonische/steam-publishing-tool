@@ -1,8 +1,5 @@
 #pragma once
 
-#include <QtCore/QDir>
-#include <QtCore/QString>
-
 namespace AppPaths {
 
 	[[nodiscard]] inline QString AppHome() { return QDir::homePath() + "/.steam-publishing-tool"; }

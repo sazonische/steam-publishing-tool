@@ -5,18 +5,6 @@
 #include "steam/workshop_update.h"
 #include "ui/upload_paths_page.h"
 
-#include <QtCore/QLocale>
-#include <QtWidgets/QDialog>
-#include <QtWidgets/QDialogButtonBox>
-#include <QtWidgets/QGridLayout>
-#include <QtWidgets/QGroupBox>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
-#include <QtWidgets/QMessageBox>
-#include <QtWidgets/QTabWidget>
-#include <QtWidgets/QTreeWidget>
-#include <QtWidgets/QVBoxLayout>
-
 namespace {
 
 	void AddFileToTree(QTreeWidget* tree, const std::filesystem::path& relativePath, std::optional<uint64_t> size) {

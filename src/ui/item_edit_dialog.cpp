@@ -6,22 +6,6 @@
 #include "media/preview_image.h"
 #include "steam/steam_names.h"
 
-#include <QtCore/QDateTime>
-#include <QtCore/QFileInfo>
-#include <QtCore/QLocale>
-#include <QtCore/QRegularExpression>
-#include <QtGui/QDesktopServices>
-#include <QtWidgets/QFileDialog>
-#include <QtWidgets/QFormLayout>
-#include <QtWidgets/QGridLayout>
-#include <QtWidgets/QGroupBox>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QInputDialog>
-#include <QtWidgets/QMessageBox>
-#include <QtWidgets/QTabBar>
-#include <QtWidgets/QTabWidget>
-#include <QtWidgets/QVBoxLayout>
-
 namespace {
 
 	constexpr int PREVIEW_VIEW_WIDTH = 384;
@@ -1134,9 +1118,7 @@ void CItemEditDialog::OnPipelineFailed(const QString& errorMessage) {
 	QMessageBox::warning(this, _isNewSubmission ? tr("New Submission") : tr("Update"), errorMessage);
 }
 
-// Escape, the X button and the Cancel button all land here. While an upload runs, ask first:
-// packing and the Cloud upload stop right away, an item update Steam already accepted cannot be
-// stopped, and an item created for this upload is deleted so the workshop keeps no empty entry.
+// Escape, X and Cancel land here. Mid-upload it asks first; CPublishPipeline::Cancel says what can be stopped.
 void CItemEditDialog::reject() {
 	if (!_busy) {
 		QDialog::reject();

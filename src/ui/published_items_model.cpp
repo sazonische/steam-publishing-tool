@@ -4,11 +4,6 @@
 
 #include "steam/steam_names.h"
 
-#include <QtCore/QDateTime>
-#include <QtCore/QLocale>
-#include <QtCore/QRegularExpression>
-#include <QtGui/QPainter>
-
 namespace {
 
 	constexpr int DESCRIPTION_PREVIEW_MAX_CHARS = 600;

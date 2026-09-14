@@ -1,12 +1,5 @@
 #pragma once
 
-#include <cstdint>
-#include <string>
-
-#include <utils/singleton.h>
-
-#include <steam/steam_api.h>
-
 // The connection to the Steam client on behalf of the chosen game. One session per process: Steamworks
 // cannot re-initialise under another AppID, so switching games means restarting the process.
 class CSteamSession : public Singleton<CSteamSession> {

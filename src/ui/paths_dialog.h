@@ -4,15 +4,6 @@
 #include "core/game_profile.h"
 #include "ui/upload_paths_page.h"
 
-#include <QtWidgets/QDialog>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QTabWidget>
-
-#include <optional>
-#include <vector>
-
 class CPathsDialog : public QDialog {
 	Q_OBJECT
 

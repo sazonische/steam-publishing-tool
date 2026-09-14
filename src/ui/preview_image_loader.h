@@ -1,14 +1,5 @@
 #pragma once
 
-#include <QtCore/QByteArray>
-#include <QtCore/QHash>
-#include <QtCore/QObject>
-#include <QtCore/QUrl>
-#include <QtGui/QPixmap>
-#include <QtNetwork/QNetworkAccessManager>
-
-#include <steam/steam_api.h>
-
 // Loads item previews by URL from the Steam CDN with a disk cache. Raw bytes are kept so an
 // animated GIF can be shown through QMovie rather than as its first frame only.
 class CPreviewImageLoader : public QObject {

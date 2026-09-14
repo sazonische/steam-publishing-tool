@@ -2,10 +2,6 @@
 
 #include "ui/published_items_model.h"
 
-#include <QtGui/QPainter>
-#include <QtGui/QPen>
-#include <QtWidgets/QApplication>
-
 namespace {
 
 	constexpr int ROW_PADDING_LEFT = 16;

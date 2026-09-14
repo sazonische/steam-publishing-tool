@@ -1,9 +1,5 @@
 #include "utils/keyvalues.h"
 
-#include <algorithm>
-#include <cctype>
-#include <format>
-#include <fstream>
 #include <sstream>
 
 namespace {
@@ -231,7 +227,7 @@ namespace KeyValues {
 	std::optional<KeyValuesNode> ParseFile(const std::filesystem::path& filePath, std::string& errorMessage) {
 		std::ifstream stream(filePath, std::ios::binary);
 		if (!stream) {
-			errorMessage = std::format("cannot open {}", filePath.string());
+			errorMessage = std::format("cannot open {}", PathText::ToUtf8(filePath));
 			return std::nullopt;
 		}
 		std::ostringstream buffer;
@@ -239,7 +235,7 @@ namespace KeyValues {
 		const std::string text = buffer.str();
 		std::optional<KeyValuesNode> root = ParseText(text, errorMessage);
 		if (!root.has_value()) {
-			errorMessage = std::format("{}: {}", filePath.string(), errorMessage);
+			errorMessage = std::format("{}: {}", PathText::ToUtf8(filePath), errorMessage);
 		}
 		return root;
 	}

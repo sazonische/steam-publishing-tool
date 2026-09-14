@@ -2,13 +2,7 @@
 
 #include "core/game_profile.h"
 
-#include <string>
-#include <string_view>
-#include <vector>
-
-// Tags a game insists on for its workshop items: the profile's list plus whatever
-// gameinfo.gi (CS2WorkshopManager/RequiredTag) names. The game file wins over the
-// profile because Valve changes it without telling anyone.
+// Required workshop tags: the profile list plus gameinfo.gi CS2WorkshopManager/RequiredTag, which wins.
 namespace RequiredTags {
 
 	std::vector<std::string> Resolve(const GameProfile& gameProfile);

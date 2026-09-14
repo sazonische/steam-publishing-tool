@@ -1,7 +1,5 @@
 #include "steam/steam_names.h"
 
-#include <array>
-
 namespace SteamNames {
 
 	std::string_view Result(EResult result) {

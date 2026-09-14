@@ -3,11 +3,6 @@
 #include "core/app_config.h"
 #include "core/steam_locator.h"
 
-#include <QtWidgets/QFileDialog>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QMessageBox>
-#include <QtWidgets/QVBoxLayout>
-
 namespace {
 
 	QString FromStringView(std::string_view text) {

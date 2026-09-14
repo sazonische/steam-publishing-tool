@@ -1,10 +1,7 @@
 cmake_minimum_required(VERSION 3.25.1)
 project(steam-publishing-tool VERSION 1.0.0 LANGUAGES CXX RC)
 
-# The version the app reports. Defaults to project(VERSION); on a tag CI passes
-# -DSPT_VERSION=<tag>: the release is named after the tag and nobody edits this file per release.
-# A plain variable, not a cache entry: a cached default would keep reporting the version of the
-# first configure after project(VERSION) is bumped. -DSPT_VERSION=<tag> from the command line still wins.
+# App version: project(VERSION) unless CI passes -DSPT_VERSION=<tag>. Plain variable, a cache entry would go stale after a bump.
 if(NOT DEFINED SPT_VERSION OR SPT_VERSION STREQUAL "")
 	set(SPT_VERSION "${PROJECT_VERSION}")
 endif()
@@ -68,6 +65,7 @@ file(GLOB_RECURSE
 qt_add_executable(${PROJECT_NAME}
 	${CODE_SOURCES}
 	res/resources.qrc
+	res/app.manifest
 	"${CMAKE_BINARY_DIR}/steam_api_resource.rc"
 )
 

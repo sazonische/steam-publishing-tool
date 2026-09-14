@@ -2,12 +2,6 @@
 
 #include "core/app_paths.h"
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QDateTime>
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-#include <QtCore/QSaveFile>
-
 #include <glaze/glaze.hpp>
 
 namespace {
@@ -44,11 +38,11 @@ bool CAppConfig::Load() {
 
 	QFile configFile(ToQString(_configFilePath));
 	if (!configFile.exists()) {
-		LogMessage(LOG_INFO, "Config %s not found, using defaults\n", _configFilePath.string().c_str());
+		LogMessage(LOG_INFO, "Config %s not found, using defaults\n", PathText::ToUtf8(_configFilePath).c_str());
 		return true;
 	}
 	if (!configFile.open(QIODevice::ReadOnly)) {
-		LogMessage(LOG_WARN, "Cannot read config %s: %s\n", _configFilePath.string().c_str(), configFile.errorString().toUtf8().constData());
+		LogMessage(LOG_WARN, "Cannot read config %s: %s\n", PathText::ToUtf8(_configFilePath).c_str(), configFile.errorString().toUtf8().constData());
 		return false;
 	}
 
@@ -64,7 +58,7 @@ bool CAppConfig::Load() {
 	AppConfigData loadedData;
 	if (auto errorCode = glz::read<readOptions>(loadedData, json); errorCode) {
 		const std::string errorText = glz::format_error(errorCode, json);
-		LogMessage(LOG_WARN, "Config %s is broken: %s\n", _configFilePath.string().c_str(), errorText.c_str());
+		LogMessage(LOG_WARN, "Config %s is broken: %s\n", PathText::ToUtf8(_configFilePath).c_str(), errorText.c_str());
 		configFile.close();
 
 		const QString brokenPath = ToQString(_configFilePath) + ".broken-" + QDateTime::currentDateTime().toString("yyyyMMdd-HHmmss");
@@ -80,7 +74,7 @@ bool CAppConfig::Load() {
 	loadedData.version = APP_CONFIG_VERSION;
 
 	_data = std::move(loadedData);
-	LogMessage(LOG_INFO, "Config loaded from %s\n", _configFilePath.string().c_str());
+	LogMessage(LOG_INFO, "Config loaded from %s\n", PathText::ToUtf8(_configFilePath).c_str());
 	return true;
 }
 
@@ -96,20 +90,20 @@ bool CAppConfig::Save() {
 
 	const QString configPath = ToQString(_configFilePath);
 	if (!QDir().mkpath(QFileInfo(configPath).absolutePath())) {
-		LogMessage(LOG_ERROR, "Cannot create config directory for %s\n", _configFilePath.string().c_str());
+		LogMessage(LOG_ERROR, "Cannot create config directory for %s\n", PathText::ToUtf8(_configFilePath).c_str());
 		return false;
 	}
 
 	// QSaveFile writes to a temporary file and renames: a crash mid-write cannot corrupt the config.
 	QSaveFile saveFile(configPath);
 	if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-		LogMessage(LOG_ERROR, "Cannot open config %s for writing: %s\n", _configFilePath.string().c_str(), saveFile.errorString().toUtf8().constData());
+		LogMessage(LOG_ERROR, "Cannot open config %s for writing: %s\n", PathText::ToUtf8(_configFilePath).c_str(), saveFile.errorString().toUtf8().constData());
 		return false;
 	}
 	saveFile.write(json.data(), static_cast<qint64>(json.size()));
 	saveFile.write("\n", 1);
 	if (!saveFile.commit()) {
-		LogMessage(LOG_ERROR, "Cannot save config %s: %s\n", _configFilePath.string().c_str(), saveFile.errorString().toUtf8().constData());
+		LogMessage(LOG_ERROR, "Cannot save config %s: %s\n", PathText::ToUtf8(_configFilePath).c_str(), saveFile.errorString().toUtf8().constData());
 		return false;
 	}
 	return true;

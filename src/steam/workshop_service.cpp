@@ -3,14 +3,6 @@
 #include "steam/steam_names.h"
 #include "steam/steam_session.h"
 
-#include <QtCore/QFile>
-#include <QtCore/QFileInfo>
-#include <QtCore/QLocale>
-
-#include <algorithm>
-#include <array>
-#include <functional>
-
 namespace {
 
 	constexpr uint32_t PREVIEW_URL_BUFFER_SIZE = 1024;
@@ -495,7 +487,7 @@ bool CWorkshopService::UploadFileToCloud(const std::filesystem::path& localPath,
 		errorMessage = tr("Steam Cloud failed to finish writing %1").arg(QString::fromStdString(cloudFileName));
 		return false;
 	}
-	LogMessage(LOG_INFO, "Uploaded %s to Steam Cloud as %s (%lld bytes)\n", localPath.string().c_str(), cloudFileName.c_str(), static_cast<long long>(totalSize));
+	LogMessage(LOG_INFO, "Uploaded %s to Steam Cloud as %s (%lld bytes)\n", PathText::ToUtf8(localPath).c_str(), cloudFileName.c_str(), static_cast<long long>(totalSize));
 	return true;
 }
 

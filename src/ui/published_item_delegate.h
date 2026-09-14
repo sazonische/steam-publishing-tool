@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QtWidgets/QStyledItemDelegate>
-
 class CPublishedItemDelegate : public QStyledItemDelegate {
 public:
 	explicit CPublishedItemDelegate(QObject* parent = nullptr);

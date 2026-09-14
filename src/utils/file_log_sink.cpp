@@ -1,10 +1,5 @@
 #include "utils/file_log_sink.h"
 
-#include <QtCore/QDateTime>
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-#include <QtCore/QFileInfo>
-
 #include <mutex>
 
 namespace FileLogSink {

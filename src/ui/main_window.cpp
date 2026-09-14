@@ -14,19 +14,6 @@
 #include "ui/paths_dialog.h"
 #include "ui/published_item_delegate.h"
 
-#include <QtCore/QProcess>
-#include <QtCore/QTimer>
-#include <QtGui/QActionGroup>
-#include <QtGui/QClipboard>
-#include <QtGui/QDesktopServices>
-#include <QtGui/QGuiApplication>
-#include <QtWidgets/QHeaderView>
-#include <QtWidgets/QMenu>
-#include <QtWidgets/QMenuBar>
-#include <QtWidgets/QMessageBox>
-#include <QtWidgets/QStatusBar>
-#include <QtWidgets/QToolBar>
-
 namespace {
 
 	constexpr const char* WORKSHOP_FILE_PAGE_URL = "https://steamcommunity.com/sharedfiles/filedetails/?id=%1";
@@ -345,7 +332,7 @@ bool CMainWindow::PreparePublishContext(PublishContext& context, bool interactiv
 
 	if (_gameProfile.contentKind == WORKSHOP_CONTENT_SOURCE1_BSP) {
 		if (paths.game.valid && !_gameProfile.mapsFolder.empty()) {
-			context.mapsFolder = paths.game.path / std::filesystem::path(std::string(_gameProfile.mapsFolder));
+			context.mapsFolder = paths.game.path / _gameProfile.mapsFolder;
 		}
 		return true;
 	}

@@ -15,15 +15,6 @@
 #include "utils/file_log_sink.h"
 #include "vpk/vpk_writer.h"
 
-#include <QtCore/QCommandLineParser>
-#include <QtCore/QCryptographicHash>
-#include <QtCore/QDir>
-#include <QtCore/QTimer>
-#include <QtNetwork/QLocalServer>
-#include <QtNetwork/QLocalSocket>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QMessageBox>
-
 namespace {
 
 	constexpr int INSTANCE_CONNECT_TIMEOUT_MS = 500;
@@ -96,7 +87,7 @@ namespace {
 		const std::vector<AddonInfo> addons = AddonLibrary::Enumerate(paths.addonsRoot);
 		const auto addonIterator = std::ranges::find_if(addons, [&addonName](const AddonInfo& addon) { return addon.name == addonName; });
 		if (addonIterator == addons.end()) {
-			LogMessage(LOG_ERROR, "Addon '%s' not found in %s (%zu addons)\n", addonName.c_str(), paths.addonsRoot.string().c_str(), addons.size());
+			LogMessage(LOG_ERROR, "Addon '%s' not found in %s (%zu addons)\n", addonName.c_str(), PathText::ToUtf8(paths.addonsRoot).c_str(), addons.size());
 			return 2;
 		}
 
@@ -106,10 +97,10 @@ namespace {
 			return 2;
 		}
 		for (const AddonFileEntry& file : manifest.files) {
-			LogMessage(LOG_INFO, "  %12llu  %s\n", static_cast<unsigned long long>(file.size), file.relativePath.generic_string().c_str());
+			LogMessage(LOG_INFO, "  %12llu  %s\n", static_cast<unsigned long long>(file.size), PathText::ToGenericUtf8(file.relativePath).c_str());
 		}
 		for (const std::filesystem::path& skipped : manifest.skippedTopLevelEntries) {
-			LogMessage(LOG_INFO, "  skipped: %s\n", skipped.generic_string().c_str());
+			LogMessage(LOG_INFO, "  skipped: %s\n", PathText::ToGenericUtf8(skipped).c_str());
 		}
 		LogMessage(LOG_INFO, "%zu files, %llu bytes; published id: %llu\n", manifest.files.size(), static_cast<unsigned long long>(manifest.totalSize), static_cast<unsigned long long>(addonIterator->publishedFileId.value_or(0)));
 
@@ -119,7 +110,7 @@ namespace {
 				LogMessage(LOG_ERROR, "VPK write failed: %s\n", errorMessage.c_str());
 				return 3;
 			}
-			LogMessage(LOG_INFO, "VPK: %u archive(s), %llu bytes written to %s\n", result->archiveCount, static_cast<unsigned long long>(result->totalBytes), packOutputDirectory->string().c_str());
+			LogMessage(LOG_INFO, "VPK: %u archive(s), %llu bytes written to %s\n", result->archiveCount, static_cast<unsigned long long>(result->totalBytes), PathText::ToUtf8(*packOutputDirectory).c_str());
 		}
 		return 0;
 	}
@@ -136,14 +127,14 @@ namespace {
 		std::string errorMessage;
 		const std::optional<BspMapInfo> info = BspMap::Inspect(bspPath, errorMessage);
 		if (!info.has_value()) {
-			LogMessage(LOG_ERROR, "Cannot inspect %s: %s\n", bspPath.string().c_str(), errorMessage.c_str());
+			LogMessage(LOG_ERROR, "Cannot inspect %s: %s\n", PathText::ToUtf8(bspPath).c_str(), errorMessage.c_str());
 			return 2;
 		}
 		std::string tags;
 		for (const std::string& tag : info->suggestedTags) {
 			tags += (tags.empty() ? "" : ", ") + tag;
 		}
-		LogMessage(LOG_INFO, "%s: BSP v%d, %llu bytes, %zu entities, player start %d, coop spawn %d, PTI end relay %d\n", bspPath.string().c_str(), info->version, static_cast<unsigned long long>(info->fileSize), info->entityCount, info->hasPlayerStart ? 1 : 0, info->hasCoopSpawn ? 1 : 0, info->hasPtiEndRelay ? 1 : 0);
+		LogMessage(LOG_INFO, "%s: BSP v%d, %llu bytes, %zu entities, player start %d, coop spawn %d, PTI end relay %d\n", PathText::ToUtf8(bspPath).c_str(), info->version, static_cast<unsigned long long>(info->fileSize), info->entityCount, info->hasPlayerStart ? 1 : 0, info->hasCoopSpawn ? 1 : 0, info->hasPtiEndRelay ? 1 : 0);
 		LogMessage(LOG_INFO, "suggested tags: %s\n", tags.c_str());
 		return info->version == BspMap::PORTAL2_BSP_VERSION ? 0 : 1;
 	}
@@ -213,7 +204,7 @@ int main(int argc, char* argv[]) {
 	const bool configLoadedCleanly = AppConfig().Load();
 
 	FileLogSink::Install(std::filesystem::path((AppPaths::LogDir() + "/SteamPublishingTool.log").toStdWString()));
-	LogMessage(LOG_INFO, "Version %s, config %s\n", APP_VERSION, AppConfig().GetConfigFilePath().string().c_str());
+	LogMessage(LOG_INFO, "Version %s, config %s\n", APP_VERSION, PathText::ToUtf8(AppConfig().GetConfigFilePath()).c_str());
 
 	if (!configLoadedCleanly) {
 		QMessageBox::warning(nullptr, QObject::tr("Settings"), QObject::tr("The settings file could not be read and was moved aside. Default settings are used.\n\n%1").arg(QString::fromStdWString(AppConfig().GetConfigFilePath().wstring())));

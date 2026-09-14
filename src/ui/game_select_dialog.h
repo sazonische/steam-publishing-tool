@@ -2,11 +2,6 @@
 
 #include "core/game_profile.h"
 
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QDialog>
-#include <QtWidgets/QListWidget>
-#include <QtWidgets/QPushButton>
-
 class CGameSelectDialog : public QDialog {
 	Q_OBJECT
 

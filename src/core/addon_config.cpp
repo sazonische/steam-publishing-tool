@@ -2,11 +2,6 @@
 
 #include "utils/keyvalues.h"
 
-#include <QtCore/QString>
-
-#include <algorithm>
-#include <format>
-
 namespace AddonConfig {
 
 	namespace {
@@ -47,7 +42,7 @@ namespace AddonConfig {
 			return std::nullopt;
 		}
 
-		const std::filesystem::path gameInfoPath = gamePath / std::filesystem::path(std::string(profile.gameInfoPath));
+		const std::filesystem::path gameInfoPath = gamePath / profile.gameInfoPath;
 		const std::optional<KeyValuesNode> root = KeyValues::ParseFile(gameInfoPath, errorMessage);
 		if (!root.has_value()) {
 			return std::nullopt;
@@ -57,7 +52,7 @@ namespace AddonConfig {
 		const KeyValuesNode* addonConfig = gameInfo ? gameInfo->Find("AddonConfig") : nullptr;
 		const KeyValuesNode* vpkDirectories = addonConfig ? addonConfig->Find("VpkDirectories") : nullptr;
 		if (!vpkDirectories) {
-			errorMessage = std::format("{} has no AddonConfig/VpkDirectories block", gameInfoPath.string());
+			errorMessage = std::format("{} has no AddonConfig/VpkDirectories block", PathText::ToUtf8(gameInfoPath));
 			return std::nullopt;
 		}
 
@@ -79,7 +74,7 @@ namespace AddonConfig {
 		}
 
 		if (rules.includes.empty()) {
-			errorMessage = std::format("{}: VpkDirectories has no include entries", gameInfoPath.string());
+			errorMessage = std::format("{}: VpkDirectories has no include entries", PathText::ToUtf8(gameInfoPath));
 			return std::nullopt;
 		}
 		return rules;

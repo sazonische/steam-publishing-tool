@@ -1,9 +1,5 @@
 #include "core/upload_rules.h"
 
-#include <QtCore/QString>
-
-#include <algorithm>
-
 namespace UploadRules {
 
 	namespace {
@@ -61,7 +57,7 @@ namespace UploadRules {
 		}
 
 		EffectiveUploadRules effective;
-		effective.gameInfoPath = gamePath / std::filesystem::path(std::string(profile.gameInfoPath));
+		effective.gameInfoPath = gamePath / profile.gameInfoPath;
 
 		const UploadRulesConfig* userRules = AppConfig().GetUploadRules(profile.id);
 		if (!userRules || !userRules->useCustomRules) {

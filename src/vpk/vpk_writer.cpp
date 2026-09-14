@@ -2,16 +2,9 @@
 
 #include "vpk/crc32.h"
 
-#include <QtCore/QCryptographicHash>
-
 #include <blake3.h>
 
-#include <array>
-#include <format>
-#include <fstream>
-#include <map>
 #include <ranges>
-#include <system_error>
 
 namespace VpkWriter {
 
@@ -66,18 +59,18 @@ namespace VpkWriter {
 		}
 
 		std::filesystem::path ArchivePath(const std::filesystem::path& outputDirectory, const std::string& baseName, uint32_t archiveIndex) {
-			return outputDirectory / std::format("{}_{:03d}.vpk", baseName, archiveIndex);
+			return outputDirectory / PathText::FromUtf8(std::format("{}_{:03d}.vpk", baseName, archiveIndex));
 		}
 
 		bool RemoveStaleVpks(const std::filesystem::path& outputDirectory, const std::string& baseName, std::string& errorMessage) {
 			std::error_code errorCode;
 			for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(outputDirectory, errorCode)) {
-				const std::string fileName = entry.path().filename().string();
+				const std::string fileName = PathText::ToUtf8(entry.path().filename());
 				if (!entry.is_regular_file() || !fileName.starts_with(baseName + "_") || !fileName.ends_with(".vpk")) {
 					continue;
 				}
 				if (!std::filesystem::remove(entry.path(), errorCode)) {
-					errorMessage = std::format("cannot delete existing {}: {}", entry.path().string(), errorCode.message());
+					errorMessage = std::format("cannot delete existing {}: {}", PathText::ToUtf8(entry.path()), errorCode.message());
 					return false;
 				}
 			}
@@ -139,9 +132,7 @@ namespace VpkWriter {
 			return digest;
 		}
 
-		// Archive checksum section: one ChunkHashFraction_t per hashChunkSize piece, laid out as in
-		// Valve's files: u16 archive index, u16 hash type, u32 offset, u32 length, 16 bytes of BLAKE3.
-		// Verified against cs2_workshop_manager output: identical for every chunk of a 167-chunk map.
+		// One ChunkHashFraction_t per hashChunkSize piece: u16 archive, u16 hash type, u32 offset, u32 length, 16 bytes of BLAKE3. Byte-identical to Valve's.
 		bool BuildChunkHashSection(const std::filesystem::path& outputDirectory, const std::string& baseName, uint32_t archiveCount, uint32_t chunkSize, std::string& section, std::string& errorMessage) {
 			std::vector<char> buffer(chunkSize);
 			for (uint32_t archiveIndex = 0; archiveIndex < archiveCount; ++archiveIndex) {
@@ -192,7 +183,7 @@ namespace VpkWriter {
 		std::error_code errorCode;
 		std::filesystem::create_directories(outputDirectory, errorCode);
 		if (errorCode) {
-			errorMessage = std::format("cannot create {}: {}", outputDirectory.string(), errorCode.message());
+			errorMessage = std::format("cannot create {}: {}", PathText::ToUtf8(outputDirectory), errorCode.message());
 			return std::nullopt;
 		}
 		if (!RemoveStaleVpks(outputDirectory, baseName, errorMessage)) {
@@ -209,7 +200,7 @@ namespace VpkWriter {
 		uint64_t bytesDone = 0;
 		std::ofstream archive(ArchivePath(outputDirectory, baseName, archiveIndex), std::ios::binary | std::ios::trunc);
 		if (!archive) {
-			errorMessage = std::format("cannot create archive 0 in {}", outputDirectory.string());
+			errorMessage = std::format("cannot create archive 0 in {}", PathText::ToUtf8(outputDirectory));
 			return std::nullopt;
 		}
 		result.writtenFiles.push_back(ArchivePath(outputDirectory, baseName, archiveIndex));
@@ -220,7 +211,7 @@ namespace VpkWriter {
 
 			std::ifstream source(sourcePath, std::ios::binary);
 			if (!source) {
-				errorMessage = std::format("cannot read {}", sourcePath.string());
+				errorMessage = std::format("cannot read {}", PathText::ToUtf8(sourcePath));
 				return std::nullopt;
 			}
 			if (archiveSize >= options.archiveSizeLimit) {
@@ -236,7 +227,7 @@ namespace VpkWriter {
 			}
 
 			TreeEntry entry;
-			SplitTreePath(file.relativePath.generic_string(), entry.directory, entry.name, entry.extension);
+			SplitTreePath(PathText::ToGenericUtf8(file.relativePath), entry.directory, entry.name, entry.extension);
 			entry.archiveIndex = static_cast<uint16_t>(archiveIndex);
 			entry.offset = static_cast<uint32_t>(archiveSize);
 
@@ -262,11 +253,11 @@ namespace VpkWriter {
 				}
 			}
 			if (source.bad() || written != file.size) {
-				errorMessage = std::format("{} could not be read completely or changed since the file list was built; refresh and try again", file.relativePath.generic_string());
+				errorMessage = std::format("{} could not be read completely or changed since the file list was built; refresh and try again", PathText::ToGenericUtf8(file.relativePath));
 				return std::nullopt;
 			}
 			if (written > 0xFFFFFFFFULL) {
-				errorMessage = std::format("{} is larger than 4 GB, VPK cannot store it", file.relativePath.generic_string());
+				errorMessage = std::format("{} is larger than 4 GB, VPK cannot store it", PathText::ToGenericUtf8(file.relativePath));
 				return std::nullopt;
 			}
 
@@ -307,22 +298,22 @@ namespace VpkWriter {
 		wholeFile.append(archiveSectionMd5.constData(), 16);
 		const QByteArray wholeFileMd5 = Md5(wholeFile.data(), wholeFile.size());
 
-		const std::filesystem::path directoryPath = outputDirectory / std::format("{}_dir.vpk", baseName);
+		const std::filesystem::path directoryPath = outputDirectory / PathText::FromUtf8(std::format("{}_dir.vpk", baseName));
 		std::ofstream directoryFile(directoryPath, std::ios::binary | std::ios::trunc);
 		if (!directoryFile) {
-			errorMessage = std::format("cannot create {}", directoryPath.string());
+			errorMessage = std::format("cannot create {}", PathText::ToUtf8(directoryPath));
 			return std::nullopt;
 		}
 		directoryFile.write(wholeFile.data(), static_cast<std::streamsize>(wholeFile.size()));
 		directoryFile.write(wholeFileMd5.constData(), 16);
 		directoryFile.write(reinterpret_cast<const char*>(SIGNATURE_SECTION.data()), static_cast<std::streamsize>(SIGNATURE_SECTION.size()));
 		if (!directoryFile) {
-			errorMessage = std::format("cannot write {}", directoryPath.string());
+			errorMessage = std::format("cannot write {}", PathText::ToUtf8(directoryPath));
 			return std::nullopt;
 		}
 		result.writtenFiles.insert(result.writtenFiles.begin(), directoryPath);
 
-		LogMessage(LOG_INFO, "VPK written: %s (%zu files, %u archive(s), %llu bytes)\n", directoryPath.string().c_str(), entries.size(), result.archiveCount, static_cast<unsigned long long>(result.totalBytes));
+		LogMessage(LOG_INFO, "VPK written: %s (%zu files, %u archive(s), %llu bytes)\n", PathText::ToUtf8(directoryPath).c_str(), entries.size(), result.archiveCount, static_cast<unsigned long long>(result.totalBytes));
 		return result;
 	}
 

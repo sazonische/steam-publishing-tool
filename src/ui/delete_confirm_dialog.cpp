@@ -1,10 +1,5 @@
 #include "ui/delete_confirm_dialog.h"
 
-#include <QtCore/QLocale>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QVBoxLayout>
-
 namespace {
 
 	constexpr int PREVIEW_WIDTH = 160;

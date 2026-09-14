@@ -4,13 +4,6 @@
 #include "core/addon_library.h"
 #include "ui/content_size_bar.h"
 
-#include <QtWidgets/QComboBox>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QWidget>
-
-#include <vector>
-
 class CAddonContentWidget : public QWidget {
 	Q_OBJECT
 

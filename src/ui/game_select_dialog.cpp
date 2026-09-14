@@ -3,10 +3,6 @@
 #include "core/game_paths.h"
 #include "ui/paths_dialog.h"
 
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QVBoxLayout>
-
 namespace {
 
 	constexpr int GAME_ID_ROLE = Qt::UserRole + 1;

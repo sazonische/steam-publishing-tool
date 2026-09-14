@@ -2,12 +2,6 @@
 
 #include "steam/workshop_item.h"
 
-#include <QtCore/QAbstractTableModel>
-#include <QtCore/QHash>
-#include <QtGui/QPixmap>
-
-#include <vector>
-
 class CPublishedItemsModel : public QAbstractTableModel {
 	Q_OBJECT
 

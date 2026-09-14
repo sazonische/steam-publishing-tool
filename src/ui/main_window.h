@@ -7,15 +7,6 @@
 #include "ui/preview_image_loader.h"
 #include "ui/published_items_model.h"
 
-#include <QtCore/QSortFilterProxyModel>
-#include <QtGui/QAction>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QMainWindow>
-#include <QtWidgets/QTableView>
-
-#include <filesystem>
-#include <optional>
-
 class CMainWindow : public QMainWindow {
 	Q_OBJECT
 

@@ -2,13 +2,8 @@
 
 #include "utils/keyvalues.h"
 
-#include <QtCore/QString>
-
-#include <algorithm>
 #include <charconv>
 #include <cwctype>
-#include <map>
-#include <system_error>
 
 namespace AddonLibrary {
 
@@ -52,7 +47,7 @@ namespace AddonLibrary {
 					continue;
 				}
 				uint64_t publishedFileId = 0;
-				const std::string folderName = entry.path().filename().string();
+				const std::string folderName = PathText::ToUtf8(entry.path().filename());
 				if (std::from_chars(folderName.data(), folderName.data() + folderName.size(), publishedFileId).ec != std::errc()) {
 					continue;
 				}
@@ -105,7 +100,7 @@ namespace AddonLibrary {
 			if (!entry.is_directory()) {
 				continue;
 			}
-			const std::string name = entry.path().filename().string();
+			const std::string name = PathText::ToUtf8(entry.path().filename());
 			if (EqualsIgnoreCase(name, PUBLISHED_VPKS_FOLDER) || EqualsIgnoreCase(name, WORKSHOP_ITEMS_FOLDER)) {
 				continue;
 			}
@@ -171,9 +166,7 @@ namespace AddonLibrary {
 			return manifest;
 		}
 
-		// Same order as cs2_workshop_manager, which takes files as Windows enumerates them: names are
-		// compared case-insensitively through their upper-case form, so "pranchas_5" precedes
-		// "prancha_textura5" ('S' < '_'). A plain byte comparison would swap them and shift the archive.
+		// Windows directory order, like cs2_workshop_manager: upper-cased compare, "pranchas_5" before "prancha_textura5".
 		std::ranges::sort(manifest.files, [](const AddonFileEntry& left, const AddonFileEntry& right) {
 			return CompareLikeWindowsDirectory(left.relativePath, right.relativePath);
 		});

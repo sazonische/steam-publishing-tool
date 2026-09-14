@@ -2,12 +2,7 @@
 
 #include "utils/keyvalues.h"
 
-#include <QtCore/QSettings>
-#include <QtCore/QString>
-
 #include <chrono>
-#include <format>
-#include <system_error>
 #include <thread>
 
 namespace SteamLocator {
@@ -177,9 +172,9 @@ namespace SteamLocator {
 		// No readable manifest anywhere: fall back to the folder name Steam uses for this game.
 		if (!installFolder.empty()) {
 			for (const std::filesystem::path& library : libraries) {
-				const std::filesystem::path installPath = Normalize(library / "steamapps" / "common" / std::filesystem::path(std::string(installFolder)));
+				const std::filesystem::path installPath = Normalize(library / "steamapps" / "common" / installFolder);
 				if (DirectoryExists(installPath)) {
-					LogMessage(LOG_INFO, "AppID %u located by folder name: %s\n", appId, installPath.string().c_str());
+					LogMessage(LOG_INFO, "AppID %u located by folder name: %s\n", appId, PathText::ToUtf8(installPath).c_str());
 					return installPath;
 				}
 			}

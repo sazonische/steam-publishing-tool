@@ -2,13 +2,6 @@
 
 #include "core/app_paths.h"
 
-#include <QtCore/QBuffer>
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-#include <QtCore/QFileInfo>
-#include <QtGui/QImage>
-#include <QtGui/QImageReader>
-
 namespace PreviewImage {
 
 	namespace {

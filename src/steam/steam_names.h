@@ -1,10 +1,5 @@
 #pragma once
 
-#include <span>
-#include <string_view>
-
-#include <steam/steam_api.h>
-
 // Human-readable names of Steam enums for the log and user-facing messages.
 namespace SteamNames {
 	std::string_view Result(EResult result);

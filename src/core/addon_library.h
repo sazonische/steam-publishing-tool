@@ -2,12 +2,6 @@
 
 #include "core/addon_config.h"
 
-#include <cstdint>
-#include <filesystem>
-#include <optional>
-#include <string>
-#include <vector>
-
 struct AddonInfo {
 	std::string name; // folder name, also source_folder in publish_data.txt
 	std::filesystem::path directory;

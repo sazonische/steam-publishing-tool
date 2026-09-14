@@ -1,10 +1,5 @@
 #include "steam/steam_session.h"
 
-#include <steam/steam_api.h>
-
-#include <QtCore/QByteArray>
-#include <QtCore/qglobal.h>
-
 bool CSteamSession::Init(uint32_t appId, std::string& errorMessage) {
 	if (_initialized) {
 		if (_appId == appId) {

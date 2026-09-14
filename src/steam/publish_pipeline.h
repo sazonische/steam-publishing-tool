@@ -5,12 +5,7 @@
 #include "steam/workshop_service.h"
 #include "steam/workshop_update.h"
 
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QThread>
-
 #include <atomic>
-#include <filesystem>
 
 // Everything the publish dialogs need to know about the game: the addon list and packing
 // rules (Source 2) or the maps folder (Source 1).
@@ -21,10 +16,8 @@ struct PublishContext {
 	std::filesystem::path mapsFolder;	 // Source 1: portal2/maps, empty when the game is not found
 };
 
-// What gets published: a new item (CreateItem -> pack -> SubmitUpdate) or replacement content
-// for an existing one (pack -> SubmitUpdate). Metadata rides along in the same SubmitUpdate.
-// Source 1 skips packing: the BSP goes to Steam Cloud, then the legacy
-// PublishWorkshopFile / UpdatePublishedFileFile calls.
+// New item: CreateItem -> pack -> SubmitUpdate. Existing: pack -> SubmitUpdate, metadata in the same call.
+// Source 1: no packing, the BSP goes to Steam Cloud, then PublishWorkshopFile / UpdatePublishedFileFile.
 struct PublishJob {
 	enum Kind : uint8_t {
 		PUBLISH_NEW = 0,
@@ -46,13 +39,8 @@ struct PublishJob {
 	std::string cloudFileName; // mymaps/<file>.bsp in Steam Cloud, removed once published
 };
 
-// The publish steps on top of CWorkshopService. Packing runs on its own thread, the Steam steps
-// come back through callbacks on the main thread. A new item that fails to upload is deleted:
-// nobody wants an empty entry in their workshop (see abandoned CreateItem results in user lists).
-//
-// Cancel() stops whatever can be stopped: packing and the Cloud upload abort between chunks; an
-// item update that Steam already accepted cannot be aborted, so the pipeline waits for its result
-// and then cleans up (deletes an item created for this run) before reporting Cancelled().
+// Packing runs on its own thread, Steam results arrive through callbacks on the main thread.
+// A new item whose upload fails or is cancelled is deleted. An update Steam already accepted cannot be aborted, Cancel() waits for it.
 class CPublishPipeline : public QObject {
 	Q_OBJECT
 

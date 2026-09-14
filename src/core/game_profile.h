@@ -1,9 +1,5 @@
 #pragma once
 
-#include <cstdint>
-#include <string_view>
-#include <vector>
-
 // How the game stores workshop content: this picks the packer and the set of editable fields.
 enum WorkshopContentKind : uint8_t {
 	WORKSHOP_CONTENT_GENERIC = 0,	// any folder through ISteamUGC::SetItemContent

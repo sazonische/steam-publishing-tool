@@ -1,11 +1,5 @@
 #include "core/publish_data.h"
 
-#include <QtCore/QDateTime>
-#include <QtCore/QSaveFile>
-#include <QtCore/QString>
-
-#include <format>
-
 namespace PublishDataFile {
 
 	namespace {
@@ -39,12 +33,12 @@ namespace PublishDataFile {
 		const std::filesystem::path filePath = directory / FILE_NAME;
 		QSaveFile saveFile(QString::fromStdWString(filePath.wstring()));
 		if (!saveFile.open(QIODevice::WriteOnly)) {
-			errorMessage = std::format("cannot open {} for writing: {}", filePath.string(), saveFile.errorString().toStdString());
+			errorMessage = std::format("cannot open {} for writing: {}", PathText::ToUtf8(filePath), saveFile.errorString().toStdString());
 			return false;
 		}
 		saveFile.write(text.data(), static_cast<qint64>(text.size()));
 		if (!saveFile.commit()) {
-			errorMessage = std::format("cannot write {}: {}", filePath.string(), saveFile.errorString().toStdString());
+			errorMessage = std::format("cannot write {}: {}", PathText::ToUtf8(filePath), saveFile.errorString().toStdString());
 			return false;
 		}
 		return true;

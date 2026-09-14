@@ -1,9 +1,7 @@
 #include "logger.h"
 
-#include <array>
 #include <cstdarg>
 #include <cstdio>
-#include <format>
 
 #ifdef _WIN32
 	#include <Windows.h>

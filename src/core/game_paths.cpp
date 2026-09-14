@@ -3,16 +3,7 @@
 #include "core/app_config.h"
 #include "core/steam_locator.h"
 
-#include <QtCore/QString>
-
-#include <format>
-#include <system_error>
-
 namespace {
-
-	std::filesystem::path PathFromUtf8(const std::string& text) {
-		return std::filesystem::path(QString::fromUtf8(text.data(), static_cast<qsizetype>(text.size())).toStdWString());
-	}
 
 } // namespace
 
@@ -32,7 +23,7 @@ ResolvedPath CGamePaths::ResolveSteamPath() const {
 		resolved.path = *_commandLineSteamPath;
 		resolved.source = PATH_SOURCE_COMMAND_LINE;
 	} else if (const std::optional<std::string>& configuredPath = AppConfig().Data().steamPath; configuredPath.has_value() && !configuredPath->empty()) {
-		resolved.path = PathFromUtf8(*configuredPath);
+		resolved.path = PathText::FromUtf8(*configuredPath);
 		resolved.source = PATH_SOURCE_CONFIG;
 	} else if (const std::optional<std::filesystem::path> detectedPath = SteamLocator::FindSteamInstallPath()) {
 		resolved.path = *detectedPath;
@@ -54,7 +45,7 @@ ResolvedGamePaths CGamePaths::Resolve(const GameProfile& profile) const {
 		resolved.game.path = *_commandLineGamePath;
 		resolved.game.source = PATH_SOURCE_COMMAND_LINE;
 	} else if (const std::optional<std::string> configuredPath = AppConfig().GetGameInstallPath(profile.id); configuredPath.has_value() && !configuredPath->empty()) {
-		resolved.game.path = PathFromUtf8(*configuredPath);
+		resolved.game.path = PathText::FromUtf8(*configuredPath);
 		resolved.game.source = PATH_SOURCE_CONFIG;
 	} else if (resolved.steam.valid) {
 		if (const std::optional<std::filesystem::path> detectedPath = SteamLocator::FindGameInstallPath(resolved.steam.path, profile.appId, profile.installFolder)) {
@@ -71,7 +62,7 @@ ResolvedGamePaths CGamePaths::Resolve(const GameProfile& profile) const {
 
 	resolved.game.valid = ValidateGamePath(profile, resolved.game.path, resolved.game.problem);
 	if (resolved.game.valid && !profile.addonsRoot.empty()) {
-		resolved.addonsRoot = resolved.game.path / std::filesystem::path(std::string(profile.addonsRoot));
+		resolved.addonsRoot = resolved.game.path / profile.addonsRoot;
 	}
 	return resolved;
 }
@@ -87,7 +78,7 @@ bool CGamePaths::ValidateGamePath(const GameProfile& profile, const std::filesys
 		return false;
 	}
 	// The marker is a file only this game has: it guards against picking a neighbouring folder.
-	if (!profile.installMarker.empty() && !std::filesystem::is_regular_file(gamePath / std::filesystem::path(std::string(profile.installMarker)), errorCode)) {
+	if (!profile.installMarker.empty() && !std::filesystem::is_regular_file(gamePath / profile.installMarker, errorCode)) {
 		problem = std::format("{} not found — this does not look like a {} folder", profile.installMarker, profile.displayName);
 		return false;
 	}

@@ -1,10 +1,5 @@
 #include "ui/theme.h"
 
-#include <QtCore/QFile>
-#include <QtGui/QPalette>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QStyleFactory>
-
 namespace Theme {
 
 	namespace {

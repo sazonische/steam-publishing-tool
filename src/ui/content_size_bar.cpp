@@ -1,14 +1,5 @@
 #include "ui/content_size_bar.h"
 
-#include <QtCore/QLocale>
-#include <QtGui/QKeyEvent>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
-
-#include <algorithm>
-#include <array>
-#include <map>
-
 namespace {
 	constexpr int BAR_HEIGHT = 22;
 	// Colours sampled from the original Workshop Manager content bar.

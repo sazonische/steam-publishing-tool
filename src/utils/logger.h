@@ -1,10 +1,5 @@
 #pragma once
 
-#include <cstdint>
-#include <functional>
-#include <string>
-#include <string_view>
-
 /**
  * LogMessageLevel defines the severity and purpose of each log message type.
  * These values are bit flags, so they can be combined using bitwise OR.

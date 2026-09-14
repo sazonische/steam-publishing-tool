@@ -1,9 +1,6 @@
 name: Windows
 
-# One artifact — a self-contained static exe, built only when a version tag is pushed (or by hand
-# from the Actions tab). Qt is built by vcpkg from source: a cold run takes an hour or more, a warm
-# one restores the archives in minutes, so the archive cache is saved right after vcpkg install,
-# even if the next step fails.
+# Static exe, built on version tags or by hand. Qt comes from vcpkg: a cold build takes over an hour, a warm one restores the cache in minutes.
 on:
   push:
     tags: ['v*', '[0-9]+.[0-9]+.[0-9]+']
@@ -139,9 +136,7 @@ jobs:
       - name: Build
         run: cmake --build --preset static-release
 
-      # "Static" is a claim worth checking: the exe must not pull in Qt or the MSVC runtime.
-      # The only allowed non-system dependency is steam_api64.dll, and only as a delay-load
-      # import: it is embedded into the exe as a resource and loaded from AppLocalData.
+      # The exe must not import Qt or the MSVC runtime; steam_api64.dll is allowed only as a delay-load import.
       - name: Package
         id: package
         run: |

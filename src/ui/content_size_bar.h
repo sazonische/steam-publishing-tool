@@ -2,9 +2,6 @@
 
 #include "core/addon_library.h"
 
-#include <QtGui/QColor>
-#include <QtWidgets/QWidget>
-
 // Byte distribution of the included files, not upload progress.
 class CContentSizeBar : public QWidget {
 	Q_OBJECT

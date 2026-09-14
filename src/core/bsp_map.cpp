@@ -1,11 +1,5 @@
 #include "core/bsp_map.h"
 
-#include <algorithm>
-#include <array>
-#include <format>
-#include <fstream>
-#include <map>
-
 namespace BspMap {
 
 	namespace {
@@ -122,7 +116,7 @@ namespace BspMap {
 	std::optional<BspMapInfo> Inspect(const std::filesystem::path& bspPath, std::string& errorMessage) {
 		std::ifstream file(bspPath, std::ios::binary);
 		if (!file) {
-			errorMessage = std::format("cannot open {}", bspPath.string());
+			errorMessage = std::format("cannot open {}", PathText::ToUtf8(bspPath));
 			return std::nullopt;
 		}
 

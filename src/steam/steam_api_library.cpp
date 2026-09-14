@@ -2,14 +2,7 @@
 
 #include "core/app_paths.h"
 
-#include <QtCore/QCoreApplication>
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-#include <QtCore/QSaveFile>
-
 #include <Windows.h>
-
-#include <format>
 
 namespace SteamApiLibrary {
 
@@ -77,11 +70,11 @@ namespace SteamApiLibrary {
 			// LOAD_WITH_ALTERED_SEARCH_PATH: the DLL's dependencies are searched next to it, not next to the exe.
 			const HMODULE dllHandle = LoadLibraryExW(dllPath.c_str(), nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
 			if (!dllHandle) {
-				errorMessage = FormatLastError(std::format("LoadLibrary({})", dllPath.string()).c_str());
+				errorMessage = FormatLastError(std::format("LoadLibrary({})", PathText::ToUtf8(dllPath)).c_str());
 				return false;
 			}
 			loadedPath = dllPath;
-			LogMessage(LOG_INFO, "steam_api64.dll loaded from %s\n", dllPath.string().c_str());
+			LogMessage(LOG_INFO, "steam_api64.dll loaded from %s\n", PathText::ToUtf8(dllPath).c_str());
 			return true;
 		}
 

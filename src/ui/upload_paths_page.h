@@ -4,16 +4,6 @@
 #include "core/app_config.h"
 #include "core/game_profile.h"
 
-#include <QtWidgets/QComboBox>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QListWidget>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QRadioButton>
-#include <QtWidgets/QWidget>
-
-#include <optional>
-#include <string>
-
 class CUploadPathsPage : public QWidget {
 	Q_OBJECT
 

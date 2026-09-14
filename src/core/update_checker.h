@@ -1,13 +1,6 @@
 #pragma once
 
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtNetwork/QNetworkAccessManager>
-
-// Asks GitHub for the newest release of this repository and compares it with the running
-// version. Only /releases/latest is used: it skips drafts and prereleases, so whatever it
-// returns is something a user is meant to install. Nothing is downloaded or run — the user
-// gets a link to the release page.
+// Compares the running version with GitHub /releases/latest (no drafts, no prereleases). Only links to the release page.
 class CUpdateChecker : public QObject {
 	Q_OBJECT
 

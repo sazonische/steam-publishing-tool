@@ -1,11 +1,5 @@
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <optional>
-#include <string>
-#include <vector>
-
 // What the BSP tells us about a Source 1 (Portal 2) map: format version, mode from the spawns,
 // the PTI relay and the tags derived from entities (as in p2-publishing-tool).
 struct BspMapInfo {

@@ -1,12 +1,5 @@
 #pragma once
 
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <vector>
-
-#include <steam/steam_api.h>
-
 // A new additional preview: a path to an image or a YouTube video ID.
 struct WorkshopPreviewAddition {
 	EItemPreviewType type{k_EItemPreviewType_Image};

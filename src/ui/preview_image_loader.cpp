@@ -2,11 +2,6 @@
 
 #include "core/app_paths.h"
 
-#include <QtGui/QImage>
-#include <QtNetwork/QNetworkDiskCache>
-#include <QtNetwork/QNetworkReply>
-#include <QtNetwork/QNetworkRequest>
-
 namespace {
 
 	constexpr const char* PUBLISHED_FILE_ID_PROPERTY = "publishedFileId";

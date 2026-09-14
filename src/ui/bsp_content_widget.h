@@ -2,15 +2,6 @@
 
 #include "core/bsp_map.h"
 
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QWidget>
-
-#include <filesystem>
-#include <optional>
-
 // Content for Source 1 games (Portal 2): a single BSP. Shows what could be learned about the map and
 // warns about a missing PTI relay — like p2-publishing-tool, with an "upload anyway" checkbox.
 class CBspContentWidget : public QWidget {

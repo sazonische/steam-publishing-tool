@@ -1,14 +1,6 @@
 #pragma once
 
-#include <filesystem>
-#include <optional>
-#include <string>
-#include <string_view>
-#include <vector>
-
-// Minimal text KeyValues (VDF) parser: libraryfolders.vdf, appmanifest_*.acf,
-// publish_data.txt, addoninfo.txt. Supports quotes with escapes, // comments,
-// nested blocks; #base/#include directives and [$WIN32] conditions are skipped.
+// Minimal VDF parser for libraryfolders.vdf, appmanifest_*.acf, publish_data.txt, addoninfo.txt. #base/#include and [$WIN32] conditions are skipped.
 struct KeyValuesNode {
 	std::string key;
 	std::string value;

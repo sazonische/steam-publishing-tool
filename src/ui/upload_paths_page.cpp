@@ -3,11 +3,6 @@
 #include "core/game_paths.h"
 #include "core/upload_rules.h"
 
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QInputDialog>
-#include <QtWidgets/QMessageBox>
-#include <QtWidgets/QVBoxLayout>
-
 namespace {
 
 	QString FromStringView(std::string_view text) {

@@ -3,16 +3,6 @@
 #include "steam/workshop_item.h"
 #include "steam/workshop_update.h"
 
-#include <QtCore/QObject>
-#include <QtCore/QString>
-
-#include <steam/steam_api.h>
-
-#include <filesystem>
-#include <functional>
-#include <utility>
-#include <vector>
-
 // Asynchronous workshop operations on top of ISteamUGC. Results arrive through CCallResult
 // in SteamAPI_RunCallbacks and are forwarded as Qt signals — the UI lives on signals only.
 class CWorkshopService : public QObject {
@@ -36,10 +26,7 @@ public:
 	// sending (invalid preview file, too many tags and so on); the reason is in errorMessage.
 	bool SubmitUpdate(const WorkshopUpdateRequest& request, QString& errorMessage);
 
-	// Legacy Source 1 path (Portal 2): the file first goes to the user's Steam Cloud, then is
-	// published through ISteamRemoteStorage::PublishWorkshopFile or swapped on an existing item
-	// through CreatePublishedFileUpdateRequest. Metadata still travels through SubmitUpdate.
-	// Return false to abort; the half-written cloud stream is cancelled and nothing is kept.
+	// Source 1 (Portal 2): file to Steam Cloud, then PublishWorkshopFile or CreatePublishedFileUpdateRequest. Progress returning false aborts.
 	using CloudUploadProgress = std::function<bool(uint64_t bytesDone, uint64_t bytesTotal)>;
 	bool UploadFileToCloud(const std::filesystem::path& localPath, const std::string& cloudFileName, const CloudUploadProgress& progress, QString& errorMessage);
 	void DeleteCloudFile(const std::string& cloudFileName);
@@ -70,9 +57,7 @@ Q_SIGNALS:
 	void LegacyFileUpdateFailed(PublishedFileId_t publishedFileId, const QString& errorMessage);
 
 private:
-	// Steam hands results over from inside SteamAPI_RunCallbacks, which does not re-enter. A slot that
-	// opens a modal dialog there (the --edit path did) would starve every later callback, so results
-	// leave the service through the event loop, one tick later.
+	// SteamAPI_RunCallbacks does not re-enter: a modal dialog opened inside a callback starves the rest, so results go through the event loop.
 	template<typename Emitter>
 	void Deliver(Emitter&& emitter) {
 		QMetaObject::invokeMethod(this, std::forward<Emitter>(emitter), Qt::QueuedConnection);

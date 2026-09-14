@@ -1,11 +1,5 @@
 #pragma once
 
-#include <cstdint>
-#include <string>
-#include <vector>
-
-#include <steam/steam_api.h>
-
 // An additional item preview: an image by URL or a YouTube/Sketchfab video ID.
 struct WorkshopPreview {
 	EItemPreviewType type{k_EItemPreviewType_Image};

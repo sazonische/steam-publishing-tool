@@ -1,19 +1,8 @@
 #pragma once
 
-#include <filesystem>
-#include <map>
-#include <optional>
-#include <string>
-#include <string_view>
-#include <vector>
-
-#include <utils/singleton.h>
-
 constexpr int APP_CONFIG_VERSION = 1;
 
-// Own packing rules instead of AddonConfig/VpkDirectories from gameinfo.gi. The seen* lists remember
-// which gameinfo entries we have already seen: new Valve entries are added automatically, while
-// what the user removed on purpose does not come back on sync.
+// Own packing rules instead of gameinfo.gi. seen* remembers gameinfo entries, so what the user removed does not come back on sync.
 struct UploadRulesConfig {
 	bool useCustomRules{false};
 	std::vector<std::string> includes;

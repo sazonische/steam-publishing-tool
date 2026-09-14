@@ -1,13 +1,5 @@
 #include "ui/bsp_content_widget.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QFileInfo>
-#include <QtCore/QLocale>
-#include <QtWidgets/QFileDialog>
-#include <QtWidgets/QGroupBox>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QVBoxLayout>
-
 CBspContentWidget::CBspContentWidget(std::filesystem::path defaultMapsFolder, QWidget* parent) :
 	QWidget(parent),
 	_defaultMapsFolder(std::move(defaultMapsFolder)) {

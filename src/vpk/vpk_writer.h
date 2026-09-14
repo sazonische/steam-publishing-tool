@@ -2,13 +2,6 @@
 
 #include "core/addon_library.h"
 
-#include <cstdint>
-#include <filesystem>
-#include <functional>
-#include <optional>
-#include <string>
-#include <vector>
-
 // VPK v2 writer in the cs2_workshop_manager layout: <base>_dir.vpk with only the tree and
 // checksums, data in <base>_000.vpk, <base>_001.vpk… in pieces of about 100 MiB.
 namespace VpkWriter {

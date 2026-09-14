@@ -2,13 +2,6 @@
 
 #include "core/game_profile.h"
 
-#include <filesystem>
-#include <optional>
-#include <string>
-#include <string_view>
-
-#include <utils/singleton.h>
-
 // Where the path came from. Priority top to bottom: command line argument, config.json, auto-detection.
 enum PathSource : uint8_t {
 	PATH_SOURCE_NONE = 0,

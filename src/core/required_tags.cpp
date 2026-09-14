@@ -3,9 +3,6 @@
 #include "core/addon_config.h"
 #include "core/game_paths.h"
 
-#include <algorithm>
-#include <cctype>
-
 namespace RequiredTags {
 
 	namespace {

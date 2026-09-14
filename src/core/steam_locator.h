@@ -1,12 +1,5 @@
 #pragma once
 
-#include <cstdint>
-#include <filesystem>
-#include <optional>
-#include <string>
-#include <string_view>
-#include <vector>
-
 // Finds the Steam installation and games the same way the client does: registry -> steamapps ->
 // libraryfolders.vdf (libraries on other drives) -> appmanifest_<appid>.acf -> installdir.
 namespace SteamLocator {
@@ -20,8 +13,6 @@ namespace SteamLocator {
 
 	// <library>/steamapps/common/<installdir> from the manifest. nullopt — the game is not installed.
 	std::optional<std::filesystem::path> FindGameInstallPath(const std::filesystem::path& steamPath, uint32_t appId);
-	// Same, but when the manifest cannot be read (Steam rewrites appmanifest_<appid>.acf the moment
-	// a Steamworks app starts, and holds it for a few milliseconds) the folder is retried and then
-	// looked up as steamapps/common/<installFolder> in every library.
+	// Retries the manifest (Steam rewrites appmanifest_<appid>.acf when a Steamworks app starts), then falls back to steamapps/common/<installFolder>.
 	std::optional<std::filesystem::path> FindGameInstallPath(const std::filesystem::path& steamPath, uint32_t appId, std::string_view installFolder);
 } // namespace SteamLocator

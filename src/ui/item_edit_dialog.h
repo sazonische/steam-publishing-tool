@@ -11,21 +11,6 @@
 #include "ui/bsp_content_widget.h"
 #include "ui/preview_image_loader.h"
 
-#include <QtCore/QTimer>
-#include <QtGui/QMovie>
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QComboBox>
-#include <QtWidgets/QDialog>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QListWidget>
-#include <QtWidgets/QPlainTextEdit>
-#include <QtWidgets/QProgressBar>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QTabWidget>
-
-#include <vector>
-
 class CItemEditDialog : public QDialog {
 	Q_OBJECT
 
